@@ -1,7 +1,7 @@
 # How to use
 
 ```
-npm i tele
+npm i vscode-tele
 ```
 
 ```

@@ -1,4 +1,4 @@
-export class Telemetry {
+export class Tele {
   constructor(context) {
     this.context = context;
     this.vscodeCommons = vscode.extensions.getExtension(
