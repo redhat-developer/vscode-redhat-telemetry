@@ -1,4 +1,4 @@
-import { Initialize } from "./initialize";
+const initialize = require("./initialize");
 // function initialize() {
 //     const vscodeCommons = vscode.extensions.getExtension(
 //         "redhat.vscode-commons"
