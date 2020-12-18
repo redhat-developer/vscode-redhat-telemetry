@@ -5,5 +5,5 @@ npm i vscode-tele
 ```
 
 ```
-import {initialize, getTelemetryService} from Telemetry;
+import {initialize, getTelemetryService} from 'vscode-tele';
 ```

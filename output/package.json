@@ -1,0 +1,16 @@
+{
+  "name": "vscode-tele",
+  "version": "1.0.11",
+  "description": "a demo of tele. Testing few things please ignore",
+  "main": "index.js",
+  "scripts": {
+    "prepublish": "npm run tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc -p tsconfig.json && cp package.json README.md output"
+  },
+  "author": "Shubham Mathur <shumathu@redhat.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.1.3"
+  }
+}
