@@ -1,11 +1,17 @@
 {
   "name": "vscode-tele",
-  "version": "1.0.12",
+  "version": "1.0.17",
   "description": "a demo of tele. Testing few things please ignore",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib",
   "scripts": {
+    "prepublish": "tsc -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Shubham Mathur <shumathu@redhat.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^4.1.3"
+  }
 }
