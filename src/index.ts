@@ -1,5 +1,4 @@
-function sum(x: number, y: number): number {
-  return x + y;
-}
-
-export { sum };
+import { sum } from "./sum";
+import { initialize } from "./initialize";
+import { Telemetry } from "./telemetry";
+export { sum, initialize, Telemetry };
