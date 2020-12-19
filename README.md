@@ -5,14 +5,13 @@ npm i vscode-tele
 ```
 
 ```
-import {Telemetry } from "vscode-tele";
-
+import {Telemetry} from "vscode-tele";
 ```
 
 ```
-    let event = {
-      type: "track",
-      name: "Test Event",
-    };
-    Telemetry.send(event);
+let event = {
+    type: "track",
+    name: "Test Event",
+};
+Telemetry.send(event);
 ```
