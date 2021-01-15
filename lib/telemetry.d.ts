@@ -7,6 +7,7 @@ interface TelemetryEvent {
 }
 export declare namespace Telemetry {
     function send(event: TelemetryEvent): void;
+    function setExtensionName(extensionName: string): void;
 }
 export {};
 //# sourceMappingURL=telemetry.d.ts.map

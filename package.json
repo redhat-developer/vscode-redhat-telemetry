@@ -1,6 +1,6 @@
 {
   "name": "vscode-tele",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "description": "a demo of tele. Testing few things please ignore",
   "main": "lib/index.js",
   "types": "lib",

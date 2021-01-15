@@ -1,4 +1,3 @@
-import { setExtensionName } from "./setExtensionName";
 import { Telemetry } from "./telemetry";
-export { setExtensionName, Telemetry };
+export { Telemetry };
 //# sourceMappingURL=index.d.ts.map

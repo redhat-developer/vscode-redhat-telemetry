@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { clientExtensionName } from "./setExtensionName";
 import { checkVscodeCommonsStatus } from "./checkStatus";
 
 interface TelemetryEvent {
@@ -10,13 +9,21 @@ interface TelemetryEvent {
   traits?: any;
 }
 
-let telemetryServiceInstance: any = null;
 export namespace Telemetry {
+  let telemetryServiceInstance: any = null;
+  let clientExtensionName = "";
+
   export function send(event: TelemetryEvent) {
     const telemetryService = getTelemetryService();
     //   context.subscriptions.push(telemetryService);
 
     telemetryService.send({ ...event });
+  }
+
+  export function setExtensionName(extensionName: string) {
+    if (extensionName) {
+      clientExtensionName = extensionName;
+    }
   }
 
   function getTelemetryService() {
