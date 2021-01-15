@@ -24,10 +24,10 @@ export namespace Telemetry {
       console.log("vscode-tele: inside telemetryServiceInstance");
 
       checkVscodeCommonsStatus().then(
-        (vscodeCommons: vscode.Extension<any> | undefined) => {
+        async (vscodeCommons: vscode.Extension<any> | undefined) => {
           const extensionIdentifier = clientExtensionName;
           const vscodeCommonsAPI = vscodeCommons?.exports;
-          telemetryServiceInstance = vscodeCommonsAPI.getTelemetryService(
+          telemetryServiceInstance = await vscodeCommonsAPI.getTelemetryService(
             extensionIdentifier
           );
         }
