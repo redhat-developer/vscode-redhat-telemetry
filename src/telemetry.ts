@@ -9,37 +9,27 @@ interface TelemetryEvent {
   traits?: any;
 }
 
+let clientExtensionName = "";
 export namespace Telemetry {
-  let telemetryServiceInstance: any = null;
-  let clientExtensionName = "";
-
   export function send(event: TelemetryEvent) {
-    const telemetryService = getTelemetryService();
     //   context.subscriptions.push(telemetryService);
+    console.log("vscode-tele: inside telemetryServiceInstance");
 
-    telemetryService.send({ ...event });
+    checkVscodeCommonsStatus().then(
+      async (vscodeCommons: vscode.Extension<any> | undefined) => {
+        const extensionIdentifier = clientExtensionName;
+        const vscodeCommonsAPI = vscodeCommons?.exports;
+        const telemetryService = await vscodeCommonsAPI.getTelemetryService(
+          extensionIdentifier
+        );
+        telemetryService.send({ ...event });
+      }
+    );
   }
 
   export function setExtensionName(extensionName: string) {
     if (extensionName) {
       clientExtensionName = extensionName;
     }
-  }
-
-  function getTelemetryService() {
-    if (telemetryServiceInstance) {
-      console.log("vscode-tele: inside telemetryServiceInstance");
-
-      checkVscodeCommonsStatus().then(
-        async (vscodeCommons: vscode.Extension<any> | undefined) => {
-          const extensionIdentifier = clientExtensionName;
-          const vscodeCommonsAPI = vscodeCommons?.exports;
-          telemetryServiceInstance = await vscodeCommonsAPI.getTelemetryService(
-            extensionIdentifier
-          );
-        }
-      );
-    }
-    return telemetryServiceInstance;
   }
 }
