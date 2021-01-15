@@ -10,26 +10,53 @@ interface TelemetryEvent {
 }
 
 let clientExtensionName = "";
+let telemetryService: any;
+let RedHatUUID: string;
 export namespace Telemetry {
-  export function send(event: TelemetryEvent) {
+  export async function send(event: TelemetryEvent) {
     //   context.subscriptions.push(telemetryService);
     console.log("vscode-tele: inside telemetryServiceInstance");
 
-    checkVscodeCommonsStatus().then(
-      async (vscodeCommons: vscode.Extension<any> | undefined) => {
-        const extensionIdentifier = clientExtensionName;
-        const vscodeCommonsAPI = vscodeCommons?.exports;
-        const telemetryService = await vscodeCommonsAPI.getTelemetryService(
-          extensionIdentifier
-        );
-        telemetryService.send({ ...event });
-      }
-    );
+    if (!checkVscodeCommonsStatus()) {
+      await activateVscodeCommons();
+    }
+    telemetryService.send({ ...event });
   }
 
   export function setExtensionName(extensionName: string) {
     if (extensionName) {
       clientExtensionName = extensionName;
     }
+  }
+
+  export function getRedHatUUID(): string {
+    return RedHatUUID;
+  }
+
+  export async function activateVscodeCommons() {
+    const vscodeCommons = vscode.extensions.getExtension(
+      "redhat.vscode-commons"
+    );
+    await vscodeCommons?.activate().then(
+      function () {
+        console.log("vscode-tele: redhat.vscode-commons activated");
+        const vscodeCommonsAPI = vscodeCommons?.exports;
+        setTelemetryService(vscodeCommonsAPI);
+        setLocalRedHatUUID(vscodeCommonsAPI);
+      },
+      function () {
+        console.log("vscode-tele: redhat.vscode-commons activation failed");
+      }
+    );
+  }
+  async function setTelemetryService(vscodeCommonsAPI: any) {
+    const extensionIdentifier = clientExtensionName;
+    telemetryService = await vscodeCommonsAPI.getTelemetryService(
+      extensionIdentifier
+    );
+  }
+
+  async function setLocalRedHatUUID(vscodeCommonsAPI: any) {
+    RedHatUUID = await vscodeCommonsAPI.getRedHatUUID();
   }
 }

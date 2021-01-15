@@ -1,3 +1,2 @@
-import * as vscode from "vscode";
-export declare function checkVscodeCommonsStatus(): Promise<vscode.Extension<any> | undefined>;
+export declare function checkVscodeCommonsStatus(): boolean;
 //# sourceMappingURL=checkStatus.d.ts.map

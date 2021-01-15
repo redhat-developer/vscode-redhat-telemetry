@@ -6,8 +6,10 @@ interface TelemetryEvent {
     traits?: any;
 }
 export declare namespace Telemetry {
-    function send(event: TelemetryEvent): void;
+    function send(event: TelemetryEvent): Promise<void>;
     function setExtensionName(extensionName: string): void;
+    function getRedHatUUID(): string;
+    function activateVscodeCommons(): Promise<void>;
 }
 export {};
 //# sourceMappingURL=telemetry.d.ts.map
