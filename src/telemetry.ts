@@ -29,9 +29,9 @@ export namespace Telemetry {
     }
   }
 
-  export function getRedHatUUID(): string {
+  export async function getRedHatUUID() {
     if (!checkVscodeCommonsStatus()) {
-      activateVscodeCommons();
+      await activateVscodeCommons();
     }
     return RedHatUUID;
   }
