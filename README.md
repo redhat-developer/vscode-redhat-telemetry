@@ -18,4 +18,7 @@ let event = {
     name: "Test Event",
 };
 Telemetry.send(event);
+
+// to get RedHat UUID
+Telemetry.getRedHatUUID()
 ```
