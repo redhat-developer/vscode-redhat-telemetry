@@ -1,8 +1,11 @@
 import * as vscode from "vscode";
-
-export async function initialize(): Promise<vscode.Extension<any> | undefined> {
+export async function checkVscodeCommonsStatus(): Promise<
+  vscode.Extension<any> | undefined
+> {
   // To get an instance of "redhat.vscode-commons"
   const vscodeCommons = vscode.extensions.getExtension("redhat.vscode-commons");
+
+  // To get segmentKey of client extension
 
   if (vscodeCommons?.isActive) {
     console.log("vscode-tele: redhat.vscode-commons is active");

@@ -1,5 +1,6 @@
-import { initialize } from "./initialize";
 import * as vscode from "vscode";
+import { clientExtensionName } from "./setExtensionName";
+import { checkVscodeCommonsStatus } from "./checkStatus";
 
 interface TelemetryEvent {
   type?: string; // type of telemetry event such as : identify, track, page, etc.
@@ -10,15 +11,17 @@ interface TelemetryEvent {
 
 export namespace Telemetry {
   export function send(event: TelemetryEvent) {
-    initialize().then((vscodeCommons: vscode.Extension<any> | undefined) => {
-      const extensionIdentifier = "redhat.alice";
-      const vscodeCommonsAPI = vscodeCommons?.exports;
-      const telemetryService = vscodeCommonsAPI.getTelemetryService(
-        extensionIdentifier
-      );
-      //   context.subscriptions.push(telemetryService);
+    checkVscodeCommonsStatus().then(
+      (vscodeCommons: vscode.Extension<any> | undefined) => {
+        const extensionIdentifier = clientExtensionName;
+        const vscodeCommonsAPI = vscodeCommons?.exports;
+        const telemetryService = vscodeCommonsAPI.getTelemetryService(
+          extensionIdentifier
+        );
+        //   context.subscriptions.push(telemetryService);
 
-      telemetryService.send({ ...event });
-    });
+        telemetryService.send({ ...event });
+      }
+    );
   }
 }

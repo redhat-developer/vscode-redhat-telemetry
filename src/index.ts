@@ -1,4 +1,5 @@
 import { sum } from "./sum";
-import { initialize } from "./initialize";
+import { setExtensionName } from "./setExtensionName";
 import { Telemetry } from "./telemetry";
-export { sum, initialize, Telemetry };
+
+export { sum, setExtensionName, Telemetry };
