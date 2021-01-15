@@ -33,7 +33,7 @@ export namespace Telemetry {
     return RedHatUUID;
   }
 
-  export async function activateVscodeCommons() {
+  async function activateVscodeCommons() {
     const vscodeCommons = vscode.extensions.getExtension(
       "redhat.vscode-commons"
     );
