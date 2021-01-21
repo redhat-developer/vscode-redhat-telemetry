@@ -1,6 +1,6 @@
 {
-  "name": "vscode-tele",
-  "version": "1.0.44",
+  "name": "vscode-redhat-telemetry",
+  "version": "0.0.1",
   "description": "a demo of tele. Testing few things please ignore",
   "main": "lib/index.js",
   "types": "lib",
