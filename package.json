@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "types": "lib",
   "scripts": {
+    "update-interfaces":"node updateInterfaces.js",
     "prepublish": "tsc -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

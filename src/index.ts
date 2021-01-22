@@ -1,3 +1,4 @@
-import { Telemetry } from "./telemetry";
+import { getRedHatUUID, getTelemetryService } from "./commons";
+import { TelemetryEvent, TelemetryService } from "./telemetry";
 
-export { Telemetry };
+export { getRedHatUUID, getTelemetryService, TelemetryEvent, TelemetryService };
