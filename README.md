@@ -1,11 +1,11 @@
 # How to use
 
 ```
-npm i vscode-redhat-telemetry
+npm i @redhat-developer/vscode-redhat-telemetry
 ```
 
 ```
-import { Telemetry } from "vscode-redhat-telemetry";
+import { Telemetry } from "@redhat-developer/vscode-redhat-telemetry";
 
 ```
 
