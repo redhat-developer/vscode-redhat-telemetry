@@ -1,17 +1,17 @@
 # How to use
 
 ```
-npm i vscode-tele
+npm i vscode-redhat-telemetry
 ```
 
 ```
-import { Telemetry } from "vscode-tele";
+import { Telemetry } from "vscode-redhat-telemetry";
 
 ```
 
 ```
 // set your extension name
-Telemetry.setExtensionName("redhat.alice");
+Telemetry.setExtension("redhat.alice");
 
 let event = {
     type: "track",

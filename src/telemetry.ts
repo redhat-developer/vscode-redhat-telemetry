@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { checkVscodeCommonsStatus } from "./checkStatus";
 
 interface TelemetryEvent {
   type?: string; // type of telemetry event such as : identify, track, page, etc.
@@ -16,7 +15,6 @@ let vscodeCommonsAPI: any;
 
 export namespace Telemetry {
   export async function send(event: TelemetryEvent) {
-    //   context.subscriptions.push(telemetryService);
     console.log("vscode-redhat-telemetry: inside telemetryServiceInstance");
     await ensureVSCodeCommonsActive();
     if (telemetryService) {
