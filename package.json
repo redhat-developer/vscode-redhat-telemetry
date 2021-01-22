@@ -1,6 +1,6 @@
 {
   "name": "@redhat-developer/vscode-redhat-telemetry",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A simple wrapper for https://github.com/redhat-developer/vscode-commons Telemetry API",
   "main": "lib/index.js",
   "types": "lib",

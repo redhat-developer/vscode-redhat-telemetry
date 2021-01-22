@@ -1,3 +1,5 @@
+![npm](https://img.shields.io/npm/v/@redhat-developer/vscode-redhat-telemetry?color=brightgreen)
+
 This library is a thin wrapper for accessing Red Hat's [vscode-commons API](https://github.com/redhat-developer/vscode-commons). It's specifically meant to be used by VS Code extensions developped by Red Hat.
 
 # How to use
