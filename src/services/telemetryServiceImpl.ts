@@ -1,12 +1,8 @@
-import * as vscode from 'vscode';
 import { Reporter } from './reporter';
 import { Logger } from '../utils/logger';
 import { TelemetrySettings } from '../interfaces/settings';
-import { SegmentInitializer } from '../utils/segmentInitializer';
 import { TelemetryEventQueue } from '../utils/telemetryEventQueue';
 import { TelemetryService, TelemetryEvent } from '../interfaces/telemetry';
-import { IdManager } from '../interfaces/IdManager';
-import { Environment } from '../interfaces/environment';
 
 /**
  * Implementation of a `TelemetryService`

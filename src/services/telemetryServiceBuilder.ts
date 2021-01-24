@@ -1,5 +1,5 @@
 import { Environment } from '../interfaces/environment';
-import { IdManager } from '../interfaces/IdManager';
+import { IdManager } from '../interfaces/idManager';
 import { Reporter } from './reporter';
 import { TelemetryService } from '../interfaces/telemetry';
 import { TelemetryServiceImpl } from './telemetryServiceImpl';

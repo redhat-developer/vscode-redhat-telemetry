@@ -1,4 +1,4 @@
-import { IdManager } from "../interfaces/IdManager";
+import { IdManager } from "../interfaces/idManager";
 import { UUID } from "../utils/uuid";
 
 /**

@@ -1,6 +1,6 @@
 import Analytics from 'analytics-node';
 import { Environment } from '../interfaces/environment';
-import { IdManager } from '../interfaces/IdManager';
+import { IdManager } from '../interfaces/idManager';
 import { TelemetryEvent } from '../interfaces/telemetry';
 import { enhance } from '../utils/events';
 import { Logger } from '../utils/logger';
