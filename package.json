@@ -1,6 +1,6 @@
 {
   "name": "@redhat-developer/vscode-redhat-telemetry",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Provides Telemetry APIs for Red Hat applications",
   "main": "lib/index.js",
   "types": "lib",
