@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { TelemetryService } from "./telemetry";
+import { TelemetryService } from "./interfaces/telemetry";
 
 
 let REDHAT_UUID: string;
