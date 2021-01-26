@@ -3,9 +3,14 @@
  */
 export interface Environment {
     /**
-     * The client application from which Telemetry events are sent.
+     * The extension from which Telemetry events are sent.
      */
-    client: Client,
+    extension: Application,
+
+    /**
+     * The client application from which Telemetry events are sent .
+     */
+    application: Application,
 
     /**
      * The platform (or OS) from from which Telemetry events are sent.
@@ -28,9 +33,9 @@ export interface Environment {
 }
 
 /**
- * The client application from which Telemetry events are sent.
+ * The client application or extension from which Telemetry events are sent.
  */
-export interface Client {
+export interface Application {
     /**
      * Client name
      */
@@ -46,5 +51,6 @@ export interface Client {
  */
 export interface Platform {
     name: string,
+    distribution?: string,
     version?: string
 }

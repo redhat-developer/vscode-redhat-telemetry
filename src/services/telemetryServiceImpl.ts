@@ -61,6 +61,7 @@ export class TelemetryServiceImpl implements TelemetryService {
 
   public dispose() {
     this.queue?.emptyQueue();
+    this.reporter.flush();
   }
 
 }

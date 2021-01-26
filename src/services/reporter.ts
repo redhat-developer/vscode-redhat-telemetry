@@ -48,4 +48,8 @@ export class Reporter {
       }
     }
   }
+
+  public flush() {
+    this.analytics?.flush();
+  }
 }

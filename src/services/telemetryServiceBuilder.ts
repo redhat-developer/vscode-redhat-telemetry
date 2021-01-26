@@ -51,9 +51,13 @@ export class TelemetryServiceBuilder {
         }
         if (!this.environment) {
             this.environment = {
-                client: {
+                extension: {
                     name: getExtensionId(this.packageJson),
                     version: this.packageJson.version
+                },
+                application: {
+                    name: 'Unknown',
+                    version: '-'
                 },
                 platform:{
                     name:'Unknown',
