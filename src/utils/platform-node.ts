@@ -4,6 +4,8 @@ import getos from 'getos';
 import { LinuxOs } from 'getos';
 import { Environment } from '..';
 import { env, version} from 'vscode';
+import { promisify } from 'util';
+
 export const PLATFORM = getPlatform();
 export const DISTRO = getDistribution();
 export const PLATFORM_VERSION = os.release();
@@ -23,21 +25,15 @@ function getPlatform(): string {
     }
     return platform.charAt(0).toUpperCase() + platform.slice(1);
 }
-
-function getDistribution(): string|undefined {
-    let distro: string|undefined;
+async function getDistribution(): Promise<string|undefined> {
     if (os.platform() === 'linux') {
-        getos((_e, plat) => {
-            let nux = plat as LinuxOs;
-            if (nux.dist) {
-                distro = nux.dist;
-            }
-        });
+      const platorm = await promisify(getos)() as LinuxOs;
+      return platorm.dist;
     }
-    return distro;
+    return undefined;
 }
 
-export function getEnvironment(extensionId: string, extensionVersion:string): Environment {
+export async function getEnvironment(extensionId: string, extensionVersion:string): Promise<Environment> {
     return {
         extension: {
             name:extensionId,
@@ -50,7 +46,7 @@ export function getEnvironment(extensionId: string, extensionVersion:string): En
         platform:{
             name:PLATFORM,
             version:PLATFORM_VERSION,
-            distribution: DISTRO
+            distribution: await DISTRO
         },
         timezone:TIMEZONE,
         locale:LOCALE,
