@@ -108,6 +108,7 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
     traits.timezone = environment.timezone;
     traits.os_name = environment.platform.name;
     traits.os_version = environment.platform.version;
+    traits.os_distribution = environment.platform.distribution;
     traits.locale = environment.locale;
   }
 
