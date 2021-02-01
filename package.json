@@ -18,6 +18,7 @@
   "author": "Red Hat",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@types/countries-and-timezones": "^2.0.3",
     "@types/getos": "^3.0.0",
     "@types/node": "^14.14.14",
     "@types/uuid": "3.4.3",
@@ -27,6 +28,7 @@
   "dependencies": {
     "@types/analytics-node": "^3.1.4",
     "analytics-node": "^3.5.0",
+    "countries-and-timezones": "^2.3.1",
     "getos": "^3.2.1",
     "os-locale": "^5.0.0",
     "uuid": "^8.3.2"

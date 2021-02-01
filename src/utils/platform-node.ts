@@ -5,15 +5,23 @@ import { LinuxOs } from 'getos';
 import { Environment } from '..';
 import { env, version} from 'vscode';
 import { promisify } from 'util';
+import { getTimezone } from 'countries-and-timezones';
 
 export const PLATFORM = getPlatform();
 export const DISTRO = getDistribution();
 export const PLATFORM_VERSION = os.release();
 export const TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 export const LOCALE = osLocale.sync().replace('_', '-');
-const tuple = LOCALE.split('-');
-export const COUNTRY = (tuple.length === 2) ? tuple[1] : '??';
+export const COUNTRY = getCountry(TIMEZONE);
 
+function getCountry(timezone: string): string {
+    const tz = getTimezone(timezone);
+    if (tz && tz?.country) {
+        return tz.country;
+    }
+    //Probably UTC timezone
+    return 'ZZ'; //Unknown country
+} 
 
 function getPlatform(): string {
     const platform: string = os.platform();
