@@ -22,7 +22,7 @@ export class TelemetryServiceImpl implements TelemetryService {
     Collects telemetry data and pushes to a queue when not opted in
     and to segment when user has opted for telemetry 
   */
-  public send(event: TelemetryEvent) {
+  public async send(event: TelemetryEvent): Promise<void> {
     Logger.log(`Event received: ${event.name}`);
     if (this.settings.isTelemetryEnabled()) {
       // flush whatever was in the queue, however it's unlikely there's anything left at this point.
@@ -34,18 +34,18 @@ export class TelemetryServiceImpl implements TelemetryService {
     }
   }
 
-  public sendStartupEvent() {
-    this.send({ name: 'startup' });
+  public async sendStartupEvent(): Promise<void> {
+    return this.send({ name: 'startup' });
   }
-  public sendShutdownEvent() {
-    this.send({ name: 'shutdown' });
+  public async sendShutdownEvent(): Promise<void> {
+    return this.send({ name: 'shutdown' });
   }
 
-  private sendEvent(event: TelemetryEvent) {
+  private async sendEvent(event: TelemetryEvent): Promise<void> {
     this.reporter.report(event);
   }
 
-  public flushQueue() {
+  public async flushQueue(): Promise<void> {
     const eventsToFlush = this.queue?.events;
     if (eventsToFlush && this.settings.isTelemetryEnabled()) {
       while (eventsToFlush.length > 0) {
@@ -59,7 +59,7 @@ export class TelemetryServiceImpl implements TelemetryService {
     this.queue?.emptyQueue();
   }
 
-  public dispose() {
+  public async dispose() {
     this.queue?.emptyQueue();
     this.reporter.flush();
   }

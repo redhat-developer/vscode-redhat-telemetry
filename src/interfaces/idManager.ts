@@ -5,5 +5,5 @@ export interface IdManager {
     /**
      * Returns the Red Hat' anonymous user id.
      */
-    getRedHatUUID():string;
+    getRedHatUUID():Promise<string>;
 }

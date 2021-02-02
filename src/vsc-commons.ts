@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { TelemetryService } from "./interfaces/telemetry";
 
 
-let REDHAT_UUID: string;
+let REDHAT_UUID: Promise<string>;
 let vscodeCommonsAPI: any;
 
 export async function getRedHatUUID() {

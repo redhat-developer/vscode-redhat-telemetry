@@ -5,8 +5,7 @@ import { UUID } from "../utils/uuid";
  * Service providing the Red Hat anonymous user id, read/stored from the `~/.redhat/anonymousId` file. 
  */
 export class FileSystemIdManager implements IdManager {
-    getRedHatUUID(): string {
+    async getRedHatUUID(): Promise<string> {
         return UUID.getRedHatUUID();
     }
-    
 }

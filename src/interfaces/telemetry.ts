@@ -17,25 +17,25 @@ export interface TelemetryService {
     /**
      * Sends a `startup` Telemetry event
      */
-    sendStartupEvent(): void;
+    sendStartupEvent(): Promise<void>;
     
     /**
      * Sends the Telemetry event
      */
-    send(event: TelemetryEvent): void;
+    send(event: TelemetryEvent): Promise<void>;
     
     /**
      * Sends a `shutdown` Telemetry event
      */
-    sendShutdownEvent(): void;
+    sendShutdownEvent(): Promise<void>;
 
     /**
      * Flushes the service's Telemetry events queue
      */
-    flushQueue(): void;
+    flushQueue(): Promise<void>;
 
     /**
      * Dispose this service
      */
-    dispose(): void;
+    dispose(): Promise<void>;
 }

@@ -8,7 +8,6 @@ import { TelemetrySettings } from '../interfaces/settings';
 import { SegmentInitializer } from '../utils/segmentInitializer';
 import { FileSystemIdManager } from './fileSystemIdManager';
 import { getExtensionId } from '../utils/extensions';
-import { version } from 'os';
 
 /**
  * `TelemetryService` builder
@@ -43,7 +42,7 @@ export class TelemetryServiceBuilder {
         return this;
     }
 
-    public build(): TelemetryService {
+    public async build(): Promise<TelemetryService> {
         this.validate();
         const analytics = SegmentInitializer.initialize(this.packageJson);
         if (!this.idManager) {

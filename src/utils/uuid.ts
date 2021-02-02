@@ -8,7 +8,7 @@ let REDHAT_ANONYMOUS_UUID: string | undefined;
 const REDHAT_NAMESPACE_UUID = '44662bc6-c388-4e0e-a652-53bda6f35923';
 
 export namespace UUID {
-  export function getRedHatUUID(redhatDir?: string) {
+  export function getRedHatUUID(redhatDir?: string): string {
     if (REDHAT_ANONYMOUS_UUID) {
       return REDHAT_ANONYMOUS_UUID;
     }
