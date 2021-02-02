@@ -42,7 +42,7 @@ export class TelemetryServiceImpl implements TelemetryService {
   }
 
   private async sendEvent(event: TelemetryEvent): Promise<void> {
-    this.reporter.report(event);
+    return this.reporter.report(event);
   }
 
   public async flushQueue(): Promise<void> {
