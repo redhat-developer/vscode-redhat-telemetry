@@ -3,7 +3,14 @@
 This library provides Telemetry APIs specifically meant to be used by VS Code extensions developped by Red Hat.
 
 # How to use from a VS Code extension
-From a VS Code extension, you need to use a thin wrapper for accessing Red Hat's [vscode-commons API](https://github.com/redhat-developer/vscode-commons). 
+
+`@redhat-developer/vscode-redhat-telemetry` acts as a thin wrapper for Red Hat's [vscode-commons API](https://github.com/redhat-developer/vscode-commons).
+
+Start by adding `redhat.vscode-commons` to the `extensionDependencies` section of your extension's package.json, so that dependency can be automatically downloaded and installed, when installing your extension from the Marketplace.
+
+```
+  "extensionDependencies": ["redhat.vscode-commons"],
+```
 
 To install `@redhat-developer/vscode-redhat-telemetry` in your VS Code extension, open a terminal and execute:
 
@@ -16,6 +23,11 @@ To get a reference to the TelemetryService instance for your VS Code extension:
 import { getTelemetryService, TelemetryService } from "@redhat-developer/vscode-redhat-telemetry";
 ...
 let telemetryService: TelemetryService = await getTelemetryService("redhat.your-extension-id")
+...
+
+// Call from your extension's activate() function
+telemetryService.sendStartupEvent(); 
+
 ...
 let event = {
     type: "track",

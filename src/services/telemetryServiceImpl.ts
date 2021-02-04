@@ -11,11 +11,13 @@ export class TelemetryServiceImpl implements TelemetryService {
   private reporter: Reporter;
   private queue: TelemetryEventQueue | undefined;
   private settings: TelemetrySettings;
+  private startTime: number;
 
   constructor(reporter: Reporter, queue: TelemetryEventQueue | undefined, settings: TelemetrySettings) {
     this.reporter = reporter;
     this.queue = queue;
     this.settings = settings;
+    this.startTime = this.getCurrentTimeInSeconds();
   }
 
   /* 
@@ -35,10 +37,14 @@ export class TelemetryServiceImpl implements TelemetryService {
   }
 
   public async sendStartupEvent(): Promise<void> {
+    this.startTime = this.getCurrentTimeInSeconds();
     return this.send({ name: 'startup' });
   }
   public async sendShutdownEvent(): Promise<void> {
-    return this.send({ name: 'shutdown' });
+    return this.send({ name: 'shutdown', properties: {
+      //Sends session duration in seconds
+      session_duration: this.getCurrentTimeInSeconds() - this.startTime
+    } });
   }
 
   private async sendEvent(event: TelemetryEvent): Promise<void> {
@@ -64,4 +70,9 @@ export class TelemetryServiceImpl implements TelemetryService {
     this.reporter.flush();
   }
 
+
+  private getCurrentTimeInSeconds(): number {
+    const now = Date.now();
+    return Math.floor(now/1000);
+  }
 }
