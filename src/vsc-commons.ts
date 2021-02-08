@@ -30,10 +30,10 @@ async function ensureVSCodeCommonsActive() {
   if (vscodeCommons && !vscodeCommons.isActive) {
     await vscodeCommons.activate().then(
       function () {
-        Logger.log('vscode-redhat-telemetry: redhat.vscode-commons activated');
+        Logger.log('redhat.vscode-commons activated');
       },
       function () {
-        Logger.log('vscode-redhat-telemetry: redhat.vscode-commons activation failed');
+        Logger.log('redhat.vscode-commons activation failed');
       }
     );
   }
