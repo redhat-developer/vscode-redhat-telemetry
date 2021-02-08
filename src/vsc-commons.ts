@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { TelemetryService } from "./interfaces/telemetry";
+import { Logger } from "./utils/logger";
 
 
 let REDHAT_UUID: Promise<string>;
@@ -29,10 +30,10 @@ async function ensureVSCodeCommonsActive() {
   if (vscodeCommons && !vscodeCommons.isActive) {
     await vscodeCommons.activate().then(
       function () {
-        console.log("vscode-redhat-telemetry: redhat.vscode-commons activated");
+        Logger.log('redhat.vscode-commons activated');
       },
       function () {
-        console.log("vscode-redhat-telemetry: redhat.vscode-commons activation failed");
+        Logger.log('redhat.vscode-commons activation failed');
       }
     );
   }
