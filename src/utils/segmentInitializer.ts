@@ -26,7 +26,7 @@ export namespace SegmentInitializer {
         ref: https://segment.com/docs/connections/sources/catalog/libraries/server/node/#configuration
         */
       let analytics: Analytics = new Analytics(segmentWriteKey, {
-        flushAt: 3,
+        flushAt: 10,
         flushInterval: 10000,
       });
       return analytics;
