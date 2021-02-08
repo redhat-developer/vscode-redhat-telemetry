@@ -1,4 +1,4 @@
-export let doLog: boolean = false;
+export let doLog: boolean = (typeof process !== 'undefined')?process.env.VSCODE_REDHAT_TELEMETRY_DEBUG === 'true': false;
 
 // This exists only for testing purposes. Could delete later.
 export namespace Logger {
