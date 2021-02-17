@@ -44,11 +44,9 @@ function startedInDebugMode(): boolean {
 
 // exported for tests
 function hasDebugFlag(args: string[]): boolean {
-  if (args) {
+  return args 
     // See https://nodejs.org/en/docs/guides/debugging-getting-started/
-    return args.some(arg => /^--inspect/.test(arg) || /^--debug/.test(arg));
-  }
-  return false;
+    && args.some(arg => /^--inspect/.test(arg) || /^--debug/.test(arg));
 }
 
 function getSegmentKey(packageJson: any): string | undefined {
