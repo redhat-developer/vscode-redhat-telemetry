@@ -2,3 +2,5 @@ node_modules
 .vscode
 lib
 .DS_Store
+.nyc_output
+coverage
