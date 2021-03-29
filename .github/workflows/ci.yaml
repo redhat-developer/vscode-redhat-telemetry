@@ -32,5 +32,8 @@ jobs:
       run: npm i
 
       # Build
-    - name: Publish to npm
+    - name: Build
       run: npm run prepublish
+
+    - name: Test
+      run: npm test
