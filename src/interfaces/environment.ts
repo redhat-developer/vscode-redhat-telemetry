@@ -10,7 +10,7 @@ export interface Environment {
     /**
      * The client application from which Telemetry events are sent .
      */
-    application: Application,
+    application: Client,
 
     /**
      * The platform (or OS) from from which Telemetry events are sent.
@@ -29,12 +29,28 @@ export interface Environment {
     /**
      * The user's ISO country code, eg. 'CA' for Canada
      */
-    country?: string
+    country?: string,
+
+    /**
+     * Username (used as basis for stripping PII from data)
+     */
+    username?: string
 }
 
 /**
  * The client application or extension from which Telemetry events are sent.
  */
+export interface Client extends Application {
+    /**
+     * UI Kind (Web / )
+     */
+    uiKind?: string,
+    /**
+     * Runs remotely?
+     */
+    remote?: boolean
+}
+
 export interface Application {
     /**
      * Client name

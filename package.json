@@ -1,13 +1,13 @@
 {
   "name": "@redhat-developer/vscode-redhat-telemetry",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Provides Telemetry APIs for Red Hat applications",
   "main": "lib/index.js",
   "types": "lib",
   "scripts": {
     "prepublish": "tsc -p .",
-    "coverage": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test",
-    "test": "mocha -r ts-node/register --ui tdd src/tests/**/*.test.ts"
+    "coverage": "nyc -r lcov -e .ts -x \"*.ts\" npm run test",
+    "test": "mocha -r ts-node/register --ui tdd \"src/tests/**/*.test.ts\""
   },
   "files": [
     "/lib"

@@ -94,15 +94,21 @@ import { TelemetryEvent } from '../interfaces/telemetry';
  */
 export function enhance(event: TelemetryEvent, environment: Environment): TelemetryEvent {
   //Inject Client name and version,  Extension id and version, and timezone to the event properties
-  const properties = event.properties ? event.properties : {};
+  const properties = event.properties ? sanitize(event.properties, environment) : {};
   if (!(event.type) || event.type == 'track') {
     properties.extension_name = environment.extension.name
     properties.extension_version = environment.extension.version
     properties.app_name = environment.application.name;
     properties.app_version = environment.application.version;
+    if (environment.application.uiKind) {
+      properties.app_kind = environment.application.uiKind;
+    }
+    if (environment.application.remote) {
+      properties.app_remote = environment.application.remote;
+    }
   }
   
-  const traits = event.traits ? event.traits : {};
+  const traits = event.traits ? sanitize(event.traits, environment) : {};
   if (event.type == 'identify') {
     //All those traits should be handled by Woopra in the context block, but are not. Meh.
     traits.timezone = environment.timezone;
@@ -142,3 +148,26 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
   };
   return enhancedEvent;
 }
+
+function sanitize(properties: any, environment: Environment) : any {
+  const sanitized:any = {};
+  for (const p in properties) {
+    const rawProperty = properties[p];
+    let sanitizedProperty = stripPaths(rawProperty);
+    if (environment.username) {
+      sanitizedProperty = sanitizedProperty.replace(environment.username,'_username_');
+    }
+    sanitized[p] = sanitizedProperty;
+  }
+  return sanitized;
+}
+
+// Extremely naive regexp to capture anything that looks like a path
+// It will certainly either be too aggressive or insufficient, depending 
+// on the case. eg. doesn't handle paths containing spaces properly 
+const naivePattern = /(([a-zA-Z](:)\\[^\s]*)|([^\s]*\/[^\s]*))/g;
+  
+function stripPaths(rawProperty: any): string {
+  return rawProperty.replace(naivePattern, 'anonymized/path');
+}
+

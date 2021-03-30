@@ -7,7 +7,6 @@ import * as assert from "assert";
 
 let dummyEvent: TelemetryEvent = { name: "test" };
 
-//TODO Move to @redhat-developer/vscode-redhat-telemetry
 suite("Event Queue Test Suite", () => {
   let queue = new TelemetryEventQueue();
   test("should generate event queue", () => {

@@ -25,7 +25,7 @@ export class Reporter {
       event = enhance(event, this.environment);
 
       let payload = {
-        anonymousId: await this.idManager.getRedHatUUID(),
+        userId: await this.idManager.getRedHatUUID(),
         event: event.name,
         properties: event.properties,
         measures: event.measures,

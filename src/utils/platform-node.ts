@@ -3,9 +3,10 @@ import osLocale from 'os-locale';
 import getos from 'getos';
 import { LinuxOs } from 'getos';
 import { Environment } from '..';
-import { env, version} from 'vscode';
+import { env, UIKind, version} from 'vscode';
 import { promisify } from 'util';
 import { getTimezone } from 'countries-and-timezones';
+import process from 'process';
 
 export const PLATFORM = getPlatform();
 export const DISTRO = getDistribution();
@@ -13,6 +14,8 @@ export const PLATFORM_VERSION = os.release();
 export const TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 export const LOCALE = osLocale.sync().replace('_', '-');
 export const COUNTRY = getCountry(TIMEZONE);
+export const UI_KIND = getUIKind();
+export const USERNAME = getUsername();
 
 function getCountry(timezone: string): string {
     const tz = getTimezone(timezone);
@@ -50,6 +53,8 @@ export async function getEnvironment(extensionId: string, extensionVersion:strin
         application: {
             name: env.appName,
             version: version,
+            uiKind: UI_KIND,
+            remote: env.remoteName !== 'undefined'
         },
         platform:{
             name:PLATFORM,
@@ -58,6 +63,36 @@ export async function getEnvironment(extensionId: string, extensionVersion:strin
         },
         timezone:TIMEZONE,
         locale:LOCALE,
-        country: COUNTRY
+        country: COUNTRY,
+        username: USERNAME
     };
+}
+function getUIKind():string {
+    switch (env.uiKind) {
+        case UIKind.Desktop:
+            return 'Desktop';
+        case UIKind.Web:
+            return 'Web';
+        default:
+            return 'Unknown';
+    }
+}
+
+function getUsername(): string | undefined {
+    const pEnv = process.env;
+
+    let username = (
+        pEnv.SUDO_USER ||
+        pEnv.C9_USER /* Cloud9 */ ||
+        pEnv.LOGNAME ||
+        pEnv.USER ||
+        pEnv.LNAME ||
+        pEnv.USERNAME
+    );
+    if (!username) {
+        try {
+            username = os.userInfo().username;
+        } catch (_) {}
+    }
+    return username;
 }
