@@ -31,6 +31,12 @@ jobs:
     - name: Install dependencies
       run: npm i
 
+    - name: Build
+      run: npm run prepublish
+
+    - name: Test
+      run: npm test
+
       # Publish to npm
     - name: Publish to npm
       run: npm publish --access public
