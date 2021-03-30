@@ -54,7 +54,7 @@ export async function getEnvironment(extensionId: string, extensionVersion:strin
             name: env.appName,
             version: version,
             uiKind: UI_KIND,
-            remote: env.remoteName !== 'undefined'
+            remote: env.remoteName !== undefined
         },
         platform:{
             name:PLATFORM,

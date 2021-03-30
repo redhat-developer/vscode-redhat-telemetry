@@ -46,7 +46,7 @@ export interface Client extends Application {
      */
     uiKind?: string,
     /**
-     * Runs remotely?
+     * Runs remotely (eg. in wsl)?
      */
     remote?: boolean
 }

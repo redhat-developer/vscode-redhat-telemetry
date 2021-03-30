@@ -103,7 +103,7 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
     if (environment.application.uiKind) {
       properties.app_kind = environment.application.uiKind;
     }
-    if (environment.application.remote) {
+    if (environment.application.remote !== undefined) {
       properties.app_remote = environment.application.remote;
     }
   }
