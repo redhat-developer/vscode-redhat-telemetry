@@ -42,19 +42,25 @@ suite('Test events enhancements', () => {
         const event: TelemetryEvent = {
             name:'Something',
             properties: {
-                foo: 'Fred likes Nutella',
+                foo: 'Fred is Fred',
                 bar: 'That c:\\Fred\\bar looks like a path',
                 error: 'An error occured in /Users/Fred/foo/bar.txt! But we\'re fine',
                 multiline: 'That url file://Fred/bar.txt is gone!\nNot that c:\\user\\bar though',
+                obj: {
+                    q: 'Who is Fred?',
+                    a: 'Fred who?'
+                }
             }
         }
 
         const betterEvent = utils.enhance(event, env);
 
-        assert.strictEqual(betterEvent.properties.foo, '_username_ likes Nutella');
+        assert.strictEqual(betterEvent.properties.foo, '_username_ is _username_');
         assert.strictEqual(betterEvent.properties.bar, 'That c:\\_username_\\bar looks like a path');
         assert.strictEqual(betterEvent.properties.error, 'An error occured in /Users/_username_/foo/bar.txt! But we\'re fine');
         assert.strictEqual(betterEvent.properties.multiline, 'That url file://_username_/bar.txt is gone!\nNot that c:\\user\\bar though');
+        assert.strictEqual(betterEvent.properties.obj.q, 'Who is _username_?');
+        assert.strictEqual(betterEvent.properties.obj.a, '_username_ who?');
     });
 
     test('should not anonymize special usernames', async () => {

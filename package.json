@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/redhat-developer/vscode-redhat-telemetry.git"
   },
-  "bugs": {
+  "bugs": 
     "url": "https://github.com/redhat-developer/vscode-redhat-telemetry/issues"
   },
   "author": "Red Hat",

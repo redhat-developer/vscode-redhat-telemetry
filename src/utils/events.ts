@@ -153,18 +153,29 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
 
 function sanitize(properties: any, environment: Environment) : any {
   const sanitized:any = {};
+  let usernameRegexp: RegExp|undefined;
+  if (environment.username && !IGNORED_USERS.includes(environment.username)) {
+    usernameRegexp = new RegExp(environment.username, 'g');
+  }
   for (const p in properties) {
     const rawProperty = properties[p];
-    if (!rawProperty) {
+    if (!rawProperty || !usernameRegexp) {
       sanitized[p] = rawProperty;
       continue;
     }
-    let sanitizedProperty = rawProperty.toString();
+    const isObj = isObject(rawProperty);
+    let sanitizedProperty = isObj? JSON.stringify(rawProperty) : rawProperty;
     //TODO implement less aggressive path stripping
     //sanitizedProperty = stripPaths(sanitizedProperty);
-    if (environment.username && !IGNORED_USERS.includes(environment.username)) {
-      sanitizedProperty = sanitizedProperty.replace(environment.username,'_username_');
-    }
+    sanitizedProperty = (sanitizedProperty as string).replace(usernameRegexp,'_username_');
+    if (isObj) {
+      //let's try to deserialize into a sanitized object
+      try {
+        sanitizedProperty = JSON.parse(sanitizedProperty);
+      } catch(e) {
+        //We messed up, we'll return the sanitized string instead
+      }
+    } 
     sanitized[p] = sanitizedProperty;
   }
   return sanitized;
@@ -179,3 +190,6 @@ function stripPaths(rawProperty: string): string {
   return rawProperty.replace(naivePattern, 'anonymized/path');
 }
 
+function isObject(test:any):boolean {
+  return test === Object(test);
+}
