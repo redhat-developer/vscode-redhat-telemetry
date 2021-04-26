@@ -92,6 +92,8 @@ import { TelemetryEvent } from '../interfaces/telemetry';
  * @param event the event to enhance
  * @param environment the environment data to inject the event with
  */
+export const IGNORED_USERS = ['user', 'gitpod', 'theia']
+
 export function enhance(event: TelemetryEvent, environment: Environment): TelemetryEvent {
   //Inject Client name and version,  Extension id and version, and timezone to the event properties
   const properties = event.properties ? sanitize(event.properties, environment) : {};
@@ -153,8 +155,14 @@ function sanitize(properties: any, environment: Environment) : any {
   const sanitized:any = {};
   for (const p in properties) {
     const rawProperty = properties[p];
-    let sanitizedProperty = stripPaths(rawProperty);
-    if (environment.username) {
+    if (!rawProperty) {
+      sanitized[p] = rawProperty;
+      continue;
+    }
+    let sanitizedProperty = rawProperty.toString();
+    //TODO implement less aggressive path stripping
+    //sanitizedProperty = stripPaths(sanitizedProperty);
+    if (environment.username && !IGNORED_USERS.includes(environment.username)) {
       sanitizedProperty = sanitizedProperty.replace(environment.username,'_username_');
     }
     sanitized[p] = sanitizedProperty;
@@ -167,7 +175,7 @@ function sanitize(properties: any, environment: Environment) : any {
 // on the case. eg. doesn't handle paths containing spaces properly 
 const naivePattern = /(([a-zA-Z](:)\\[^\s]*)|([^\s]*\/[^\s]*))/g;
   
-function stripPaths(rawProperty: any): string {
+function stripPaths(rawProperty: string): string {
   return rawProperty.replace(naivePattern, 'anonymized/path');
 }
 
