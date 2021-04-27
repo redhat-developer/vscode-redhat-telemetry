@@ -159,7 +159,7 @@ function sanitize(properties: any, environment: Environment) : any {
   }
   for (const p in properties) {
     const rawProperty = properties[p];
-    if (!rawProperty || !usernameRegexp) {
+    if (!rawProperty || !usernameRegexp || isNonStringPrimitive(rawProperty)) {
       sanitized[p] = rawProperty;
       continue;
     }
@@ -192,4 +192,8 @@ function stripPaths(rawProperty: string): string {
 
 function isObject(test:any):boolean {
   return test === Object(test);
+}
+
+function isNonStringPrimitive(test:any) {
+  return typeof test !== "string" && !(test instanceof String) && !isObject(test);
 }

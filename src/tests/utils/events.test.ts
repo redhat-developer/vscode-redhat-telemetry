@@ -43,6 +43,8 @@ suite('Test events enhancements', () => {
             name:'Something',
             properties: {
                 foo: 'Fred is Fred',
+                qty: 10,
+                active: false,
                 bar: 'That c:\\Fred\\bar looks like a path',
                 error: 'An error occured in /Users/Fred/foo/bar.txt! But we\'re fine',
                 multiline: 'That url file://Fred/bar.txt is gone!\nNot that c:\\user\\bar though',
@@ -55,6 +57,8 @@ suite('Test events enhancements', () => {
 
         const betterEvent = utils.enhance(event, env);
 
+        assert.strictEqual(betterEvent.properties.qty, 10);
+        assert.strictEqual(betterEvent.properties.active, false);
         assert.strictEqual(betterEvent.properties.foo, '_username_ is _username_');
         assert.strictEqual(betterEvent.properties.bar, 'That c:\\_username_\\bar looks like a path');
         assert.strictEqual(betterEvent.properties.error, 'An error occured in /Users/_username_/foo/bar.txt! But we\'re fine');
