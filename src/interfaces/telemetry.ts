@@ -11,7 +11,7 @@ export interface TelemetryEvent {
 }
 
 /**
- * Telemetry Service
+ * Service for sending Telemetry events
  */
 export interface TelemetryService {
     /**

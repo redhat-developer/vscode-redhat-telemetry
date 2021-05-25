@@ -154,7 +154,7 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
 function sanitize(properties: any, environment: Environment) : any {
   const sanitized:any = {};
   let usernameRegexp: RegExp|undefined;
-  if (environment.username && !IGNORED_USERS.includes(environment.username)) {
+  if (environment.username && environment.username.length > 3 && !IGNORED_USERS.includes(environment.username)) {
     usernameRegexp = new RegExp(environment.username, 'g');
   }
   for (const p in properties) {
