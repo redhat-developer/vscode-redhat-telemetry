@@ -2,7 +2,7 @@
 
 # Red Hat Telemetry Collection API
 
-This library provides a telemetry collection API for extensions published by Red Hat. **After getting the user's approval, anonymous** [usage data](https://github.com/redhat-developer/vscode-redhat-telemetry/blob/master/USAGE_DATA.md) is collected and sent to Red Hat servers, to help improve our products and services. Read our [privacy statement](https://developers.redhat.com/article/tool-data-collection) to learn more about it.
+This library provides a telemetry collection API for extensions published by Red Hat. **After getting the user's approval, anonymous** [usage data](https://github.com/redhat-developer/vscode-redhat-telemetry/blob/HEAD/USAGE_DATA.md) is collected and sent to Red Hat servers, to help improve our products and services. Read our [privacy statement](https://developers.redhat.com/article/tool-data-collection) to learn more about it.
 
 The first time one of Red Hat's extensions engaging in telemetry collection runs, the user will be asked to opt-in Red Hat's telemetry collection program:
 
@@ -110,7 +110,7 @@ Once telemetry is in place, you need to document the extent of the telemetry col
 * add a `Data and Telemetry` paragraph at the end of your extension's README file:
 > `The ***** extension collects anonymous [usage data](USAGE_DATA.md) and sends it to Red Hat servers to help improve our products and services. Read our [privacy statement](https://developers.redhat.com/article/tool-data-collection) to learn more. This extension respects the `redhat.elemetry.enabled` setting which you can learn more about at https://github.com/redhat-developer/vscode-redhat-telemetry#how-to-disable-telemetry-reporting`
 
-* add a reference to your telemetry documentation page to this repository's own [USAGE_DATA.md](https://github.com/redhat-developer/vscode-redhat-telemetry/blob/master/USAGE_DATA.md#other-extensions).
+* add a reference to your telemetry documentation page to this repository's own [USAGE_DATA.md](https://github.com/redhat-developer/vscode-redhat-telemetry/blob/HEAD/USAGE_DATA.md#other-extensions).
 
 ### Turn on logging during development
 In your `.vscode/launch.json`, set the `VSCODE_REDHAT_TELEMETRY_DEBUG` environment variable to `true`:
