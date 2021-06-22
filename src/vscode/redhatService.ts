@@ -4,6 +4,7 @@ import { ConfigurationChangeEvent, Disposable, env, Extension, ExtensionContext,
 import { TelemetryService, TelemetryServiceBuilder } from "..";
 import { RedHatService } from "../interfaces/redhatService";
 import { IdManagerFactory } from "../services/idManagerFactory";
+import { getExtensionId, loadPackageJson } from '../utils/extensions';
 import { Logger } from "../utils/logger";
 import { getEnvironment } from "../utils/platform-node";
 import { DEFAULT_SEGMENT_DEBUG_KEY, DEFAULT_SEGMENT_KEY, OPT_OUT_INSTRUCTIONS_URL, PRIVACY_STATEMENT_URL } from './constants';
@@ -22,8 +23,9 @@ const RETRY_OPTIN_DELAY_IN_MS = 24 * 60 * 60 * 1000; // 24h
  * @returns a Promise of RedHatService
  */
 export async function getRedHatService(context: ExtensionContext): Promise<RedHatService> {
-  const extensionId = context.extension.id;
-  const packageJson = getPackageJson(context.extension);
+  const extensionInfo = getExtension(context);
+  const extensionId = extensionInfo.id;
+  const packageJson = getPackageJson(extensionInfo);
   const settings = new VSCodeSettings();
   const idManager = IdManagerFactory.getIdManager();
 
@@ -41,7 +43,7 @@ export async function getRedHatService(context: ExtensionContext): Promise<RedHa
   // so it stops/starts sending data when redhat.telemetry.enabled changes
   context.subscriptions.push(onDidChangeTelemetryEnabled(telemetryService));
 
-  openTelemetryOptInDialogIfNeeded(context, settings);
+  openTelemetryOptInDialogIfNeeded(context, extensionId, settings);
 
   telemetryService.send({
     type: 'identify',
@@ -64,7 +66,7 @@ function onDidChangeTelemetryEnabled(telemetryService: TelemetryService): Dispos
   );
 }
 
-async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, settings: VSCodeSettings) {
+async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, extensionId:string, settings: VSCodeSettings) {
   if (settings.isTelemetryConfigured()) {
     return;
   }
@@ -77,9 +79,8 @@ async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, setti
     const rawdata = fs.readFileSync(optinPopupInfo, { encoding: 'utf8' });
     popupInfo = JSON.parse(rawdata);
   }
-  const extensionId = context.extension.id;
   if (popupInfo) {
-    if (popupInfo.sessionId !== env.sessionId || popupInfo.owner !== context.extension.id) {
+    if (popupInfo.sessionId !== env.sessionId || popupInfo.owner !== extensionId) {
       //someone else is showing the popup, bail.
       return;
     }
@@ -119,7 +120,25 @@ async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, setti
   }
 }
 
-function getPackageJson(extension: Extension<any>): any {
+interface ExtensionInfo {
+  id:string,
+  packageJSON: any
+}
+
+function getExtension(context: ExtensionContext): ExtensionInfo  {
+  if (context.extension) {
+    return context.extension;
+  }
+  //When running in older vscode versions:
+  const packageJson = loadPackageJson(context.extensionPath);
+  const info = {
+    id: getExtensionId(packageJson),
+    packageJSON: packageJson
+  };
+  return info;
+}
+
+function getPackageJson(extension: ExtensionInfo): any {
   const packageJson = extension.packageJSON;
   if (!packageJson.segmentWriteKey) {
     packageJson.segmentWriteKey = DEFAULT_SEGMENT_KEY;
