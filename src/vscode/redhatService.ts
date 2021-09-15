@@ -3,6 +3,7 @@ import * as path from 'path';
 import { ConfigurationChangeEvent, Disposable, env, Extension, ExtensionContext, window, workspace } from "vscode";
 import { TelemetryService, TelemetryServiceBuilder } from "..";
 import { RedHatService } from "../interfaces/redhatService";
+import { FileSystemCacheService } from '../services/fileSystemCacheService';
 import { IdManagerFactory } from "../services/idManagerFactory";
 import { getExtensionId, loadPackageJson } from '../utils/extensions';
 import { Logger } from "../utils/logger";
@@ -28,10 +29,11 @@ export async function getRedHatService(context: ExtensionContext): Promise<RedHa
   const packageJson = getPackageJson(extensionInfo);
   const settings = new VSCodeSettings();
   const idManager = IdManagerFactory.getIdManager();
-
+  const cachePath = path.resolve(context.globalStorageUri.fsPath, 'telemetry.cache');
   const builder = new TelemetryServiceBuilder(packageJson)
     .setSettings(settings)
     .setIdManager(idManager)
+    .setCacheService(new FileSystemCacheService(cachePath))
     .setEnvironment(await getEnvironment(extensionId, packageJson.version));
 
   const telemetryService = await builder.build();
@@ -158,7 +160,7 @@ interface PopupInfo {
 function safeCleanup(filePath: string) {
   try {
     fs.unlinkSync(filePath);
-  } catch (err) {
+  } catch (err : any) {
     Logger.log(err);
   }
   Logger.log(`Deleted ${filePath}`);
