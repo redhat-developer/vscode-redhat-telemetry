@@ -3,6 +3,7 @@ import { Logger } from '../utils/logger';
 import { TelemetrySettings } from '../interfaces/settings';
 import { TelemetryEventQueue } from '../utils/telemetryEventQueue';
 import { TelemetryService, TelemetryEvent } from '../interfaces/telemetry';
+import { CacheService } from '../interfaces/cacheService';
 
 /**
  * Implementation of a `TelemetryService`
