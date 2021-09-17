@@ -29,7 +29,7 @@ export async function getRedHatService(context: ExtensionContext): Promise<RedHa
   const packageJson = getPackageJson(extensionInfo);
   const settings = new VSCodeSettings();
   const idManager = IdManagerFactory.getIdManager();
-  const cachePath = path.resolve(context.globalStorageUri.fsPath, 'telemetry.cache');
+  const cachePath = path.resolve(getTelemetryWorkingDir(context), 'cache');
   const builder = new TelemetryServiceBuilder(packageJson)
     .setSettings(settings)
     .setIdManager(idManager)
@@ -75,7 +75,7 @@ async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, exten
 
   let popupInfo: PopupInfo | undefined;
 
-  const parentDir = path.resolve(context.globalStorageUri.fsPath, '..');
+  const parentDir = getTelemetryWorkingDir(context);
   const optinPopupInfo = path.resolve(parentDir, 'redhat.optin.json');
   if (fs.existsSync(optinPopupInfo)) {
     const rawdata = fs.readFileSync(optinPopupInfo, { encoding: 'utf8' });
@@ -93,7 +93,7 @@ async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, exten
       time: new Date().getTime() //for troubleshooting purposes
     }
     if (!fs.existsSync(parentDir)) {
-      fs.mkdirSync(parentDir);
+      fs.mkdirSync(parentDir, { recursive: true });
     }
     fs.writeFileSync(optinPopupInfo, JSON.stringify(popupInfo));
     context.subscriptions.push({
@@ -173,5 +173,9 @@ function shutdownHook(telemetryService: TelemetryService): Disposable {
       await telemetryService.dispose();
     }
   };
+}
+
+function getTelemetryWorkingDir(context: ExtensionContext): string {
+  return path.resolve(context.globalStorageUri.fsPath, '..', 'vscode-redhat-telemetry');
 }
 
