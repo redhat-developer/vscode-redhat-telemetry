@@ -2,6 +2,9 @@ name: CI Build
 
 # Controls when the action will run. Triggers the workflow on pushed tags 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - "*"
