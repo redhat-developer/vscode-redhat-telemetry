@@ -28,7 +28,6 @@ suite('Test events enhancements', () => {
         }
 
         const betterEvent = utils.enhance(event, env);
-
         assert.strictEqual(betterEvent.properties.app_name, 'SuperCode');
         assert.strictEqual(betterEvent.properties.app_version, '6.6.6');
         assert.strictEqual(betterEvent.properties.extension_name, 'my-ext');

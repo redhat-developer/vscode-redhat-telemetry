@@ -24,7 +24,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/chai": "^4.2.15",
-    "@types/countries-and-timezones": "^2.0.3",
+    "@types/countries-and-timezones": "2.0.3",
     "@types/getos": "^3.0.0",
     "@types/mocha": "^8.2.1",
     "@types/mock-fs": "^4.13.1",
@@ -37,12 +37,12 @@
     "mock-fs": "^5.0.0",
     "nyc": "^15.1.0",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.3"
+    "typescript": "^4.4.2"
   },
   "dependencies": {
     "@types/analytics-node": "^3.1.4",
     "analytics-node": "^3.5.0",
-    "countries-and-timezones": "^2.3.1",
+    "countries-and-timezones": "2.5.0",
     "getos": "^3.2.1",
     "object-hash": "^2.2.0",
     "os-locale": "^5.0.0",

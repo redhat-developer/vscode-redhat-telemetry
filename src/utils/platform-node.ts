@@ -5,8 +5,8 @@ import { LinuxOs } from 'getos';
 import { Environment } from '..';
 import { env, UIKind, version} from 'vscode';
 import { promisify } from 'util';
-import { getTimezone } from 'countries-and-timezones';
 import process from 'process';
+import { getCountry } from './geolocation';
 
 export const PLATFORM = getPlatform();
 export const DISTRO = getDistribution();
@@ -17,14 +17,6 @@ export const COUNTRY = getCountry(TIMEZONE);
 export const UI_KIND = getUIKind();
 export const USERNAME = getUsername();
 
-function getCountry(timezone: string): string {
-    const tz = getTimezone(timezone);
-    if (tz && tz?.country) {
-        return tz.country;
-    }
-    //Probably UTC timezone
-    return 'ZZ'; //Unknown country
-} 
 
 function getPlatform(): string {
     const platform: string = os.platform();
