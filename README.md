@@ -43,6 +43,7 @@ Unless your extension already depends on a telemetry-enabled Red Hat extension, 
           "type": "boolean",
           "default": null,
           "markdownDescription": "Enable usage data and errors to be sent to Red Hat servers. Read our [privacy statement](https://developers.redhat.com/article/tool-data-collection).",
+          "tags":[ "telemetry" ],
           "scope": "window"
         },
       }
