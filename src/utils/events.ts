@@ -165,8 +165,7 @@ function sanitize(properties: any, environment: Environment) : any {
     }
     const isObj = isObject(rawProperty);
     let sanitizedProperty = isObj? JSON.stringify(rawProperty) : rawProperty;
-    //TODO implement less aggressive path stripping
-    //sanitizedProperty = stripPaths(sanitizedProperty);
+    
     sanitizedProperty = (sanitizedProperty as string).replace(usernameRegexp,'_username_');
     if (isObj) {
       //let's try to deserialize into a sanitized object
@@ -179,15 +178,6 @@ function sanitize(properties: any, environment: Environment) : any {
     sanitized[p] = sanitizedProperty;
   }
   return sanitized;
-}
-
-// Extremely naive regexp to capture anything that looks like a path
-// It will certainly either be too aggressive or insufficient, depending 
-// on the case. eg. doesn't handle paths containing spaces properly 
-const naivePattern = /(([a-zA-Z](:)\\[^\s]*)|([^\s]*\/[^\s]*))/g;
-  
-function stripPaths(rawProperty: string): string {
-  return rawProperty.replace(naivePattern, 'anonymized/path');
 }
 
 function isObject(test:any):boolean {
