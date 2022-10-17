@@ -1,0 +1,22 @@
+{
+    "*": {
+        "enabled":"all",
+        "refresh": "2h",
+        "ratio": "1",
+        "includes": [
+            {
+                "name" : "*"
+            }
+        ]
+    },
+    "redhat.vscode-hypothetical": {
+        "enabled": "errors",
+        "ratio": "0.5",
+        "excludes": [
+            {
+                "property": "error",
+                "value": "*stackoverflow*"
+            }
+        ]
+    }
+}

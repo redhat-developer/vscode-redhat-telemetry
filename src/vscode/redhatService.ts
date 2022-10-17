@@ -3,13 +3,14 @@ import * as path from 'path';
 import { ConfigurationChangeEvent, Disposable, env, Extension, ExtensionContext, window, workspace } from "vscode";
 import { TelemetryService, TelemetryServiceBuilder } from "..";
 import { RedHatService } from "../interfaces/redhatService";
+import { ConfigurationManager } from '../services/configurationManager';
 import { FileSystemCacheService } from '../services/fileSystemCacheService';
 import { IdManagerFactory } from "../services/idManagerFactory";
 import { getExtensionId, loadPackageJson } from '../utils/extensions';
 import { Logger } from "../utils/logger";
 import { getEnvironment } from "../utils/platform-node";
 import { DEFAULT_SEGMENT_DEBUG_KEY, DEFAULT_SEGMENT_KEY, OPT_OUT_INSTRUCTIONS_URL, PRIVACY_STATEMENT_URL } from './constants';
-import { VSCodeSettings } from './settings';
+import { didUserDisableTelemetry, VSCodeSettings } from './settings';
 
 
 const RETRY_OPTIN_DELAY_IN_MS = 24 * 60 * 60 * 1000; // 24h
@@ -30,10 +31,12 @@ export async function getRedHatService(context: ExtensionContext): Promise<RedHa
   const settings = new VSCodeSettings();
   const idManager = IdManagerFactory.getIdManager();
   const cachePath = path.resolve(getTelemetryWorkingDir(context), 'cache');
+  const cacheService = new FileSystemCacheService(cachePath);
   const builder = new TelemetryServiceBuilder(packageJson)
     .setSettings(settings)
     .setIdManager(idManager)
-    .setCacheService(new FileSystemCacheService(cachePath))
+    .setCacheService(cacheService)
+    .setConfigurationManager(new ConfigurationManager(extensionId, cacheService))
     .setEnvironment(await getEnvironment(extensionId, packageJson.version));
 
   const telemetryService = await builder.build();
@@ -63,13 +66,15 @@ function onDidChangeTelemetryEnabled(telemetryService: TelemetryService): Dispos
     //as soon as user changed the redhat.telemetry setting, we consider
     //opt-in (or out) has been set, so whichever the choice is, we flush the queue
     (e: ConfigurationChangeEvent) => {
-      telemetryService.flushQueue();
+      if (e.affectsConfiguration("redhat.telemetry") || e.affectsConfiguration("telemetry")) {
+        telemetryService.flushQueue();
+      }
     }
   );
 }
 
 async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, extensionId:string, settings: VSCodeSettings) {
-  if (settings.isTelemetryConfigured()) {
+  if (settings.isTelemetryConfigured() || didUserDisableTelemetry()) {
     return;
   }
 

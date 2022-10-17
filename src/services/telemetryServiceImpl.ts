@@ -4,20 +4,23 @@ import { TelemetrySettings } from '../interfaces/settings';
 import { TelemetryEventQueue } from '../utils/telemetryEventQueue';
 import { TelemetryService, TelemetryEvent } from '../interfaces/telemetry';
 import { CacheService } from '../interfaces/cacheService';
+import { ConfigurationManager } from './configurationManager';
+import { IdManager } from '../interfaces/idManager';
+import { Environment } from '../interfaces/environment';
+import { enhance, isError } from '../utils/events';
 
 /**
  * Implementation of a `TelemetryService`
  */
 export class TelemetryServiceImpl implements TelemetryService {
-  private reporter: Reporter;
-  private queue: TelemetryEventQueue | undefined;
-  private settings: TelemetrySettings;
   private startTime: number;
 
-  constructor(reporter: Reporter, queue: TelemetryEventQueue | undefined, settings: TelemetrySettings) {
-    this.reporter = reporter;
-    this.queue = queue;
-    this.settings = settings;
+  constructor(private reporter: Reporter, 
+              private queue: TelemetryEventQueue | undefined, 
+              private settings: TelemetrySettings, 
+              private idManager: IdManager, 
+              private environment: Environment,
+              private configurationManager?: ConfigurationManager) {
     this.startTime = this.getCurrentTimeInSeconds();
   }
 
@@ -27,6 +30,7 @@ export class TelemetryServiceImpl implements TelemetryService {
   */
   public async send(event: TelemetryEvent): Promise<void> {
     Logger.log(`Event received: ${event.name}`);
+
     if (this.settings.isTelemetryEnabled()) {
       // flush whatever was in the queue, however it's unlikely there's anything left at this point.
       this.flushQueue();
@@ -49,7 +53,27 @@ export class TelemetryServiceImpl implements TelemetryService {
   }
 
   private async sendEvent(event: TelemetryEvent): Promise<void> {
-    return this.reporter.report(event);
+    //Check against VS Code settings
+    const level = this.settings.getTelemetryLevel();
+    if (level && ["error","crash"].includes(level) && !isError(event)) {
+      return;
+    }
+
+    event = enhance(event, this.environment);
+    let payload = {
+      userId: await this.idManager.getRedHatUUID(),
+      event: event.name,
+      properties: event.properties,
+      measures: event.measures,
+      traits: event.traits,
+      context: event.context
+    };
+
+    //Check against Extension configuration
+    const config = await this.configurationManager?.getExtensionConfiguration();
+    if (!config || config.canSend(payload)) {
+      return this.reporter.report(payload);
+    }
   }
 
   public async flushQueue(): Promise<void> {
