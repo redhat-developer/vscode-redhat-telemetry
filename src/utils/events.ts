@@ -184,6 +184,10 @@ function isObject(test:any):boolean {
   return test === Object(test);
 }
 
+export function isError(event:any):boolean {
+  return event.properties?.error || event.properties?.errors;
+}
+
 function isNonStringPrimitive(test:any) {
   return typeof test !== "string" && !(test instanceof String) && !isObject(test);
 }

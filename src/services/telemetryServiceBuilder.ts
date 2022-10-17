@@ -9,6 +9,7 @@ import { SegmentInitializer } from '../utils/segmentInitializer';
 import { FileSystemIdManager } from './fileSystemIdManager';
 import { getExtensionId } from '../utils/extensions';
 import { CacheService } from '../interfaces/cacheService';
+import { ConfigurationManager } from './configurationManager';
 
 /**
  * `TelemetryService` builder
@@ -19,6 +20,7 @@ export class TelemetryServiceBuilder {
     private idManager?: IdManager;
     private environment?: Environment;
     private cacheService?: CacheService;
+    private configurationManager?: ConfigurationManager;
   
     constructor(packageJson?:any) {
       this.packageJson = packageJson;
@@ -41,6 +43,11 @@ export class TelemetryServiceBuilder {
 
     public setEnvironment(environment: Environment): TelemetryServiceBuilder {
         this.environment = environment;
+        return this;
+    }
+
+    public setConfigurationManager(configManager: ConfigurationManager): TelemetryServiceBuilder {
+        this.configurationManager = configManager;
         return this;
     }
 
@@ -71,11 +78,11 @@ export class TelemetryServiceBuilder {
                 }
             };
         }
-        const reporter = new Reporter(analytics, this.idManager, this.environment!, this.cacheService);
+        const reporter = new Reporter(analytics, this.cacheService);
         const queue = this.settings!.isTelemetryConfigured()
           ? undefined
           : new TelemetryEventQueue();
-        return new TelemetryServiceImpl(reporter, queue, this.settings!);
+        return new TelemetryServiceImpl(reporter, queue, this.settings!, this.idManager, this.environment!, this.configurationManager);
     }
 
     private validate() {

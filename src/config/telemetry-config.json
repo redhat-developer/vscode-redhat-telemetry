@@ -1,0 +1,11 @@
+{
+    "*": {
+        "enabled":"all",
+        "refresh": "12h",
+        "includes": [
+            {
+                "name" : "*"
+            }
+        ]
+    }
+}

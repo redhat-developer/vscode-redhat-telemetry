@@ -16,9 +16,48 @@ From File > Preferences > Settings (On macOS: Code > Preferences > Settings), se
 
 
 ## How to disable telemetry reporting?
-If you want to stop sending usage data to Red Hat, you can set the `redhat.telemetry.enabled` user setting to `false`.
+If you want to stop sending usage data to Red Hat, you can set the `redhat.telemetry.enabled` user setting to `false`. 
 
 From File > Preferences > Settings (On macOS: Code > Preferences > Settings), search for telemetry, and uncheck the `Redhat > Telemetry : Enabled` setting. This will silence all telemetry events from Red Hat extensions going forward.
+
+Additionally, and starting from version 0.5.0, this module abides by Visual Studio Code's telemetry level: if `telemetry.telemetryLevel` is set to `off`, then no telemetry events will be sent to Red Hat, even if `redhat.telemetry.enabled` is set to `true`. If `telemetry.telemetryLevel` is set to `error` or `crash`, only events containing an `error` or `errors` property will be sent to Red Hat.
+
+# Remote configuration
+Starting from version 0.5.0, Red Hat Telemetry can be remotely configured. Once every 12h (or whatever is remotely configured), [telemetry-config.json](src/config/telemetry-config.json) will be downloaded to, depending on your platform:
+
+- **Windows** `%APPDATA%\Code\User\globalStorage\vscode-redhat-telemetry\cache\telemetry-config.json`
+- **macOS** `$HOME/Library/Application\ Support/Code/User/globalStorage/vscode-redhat-telemetry/cache/telemetry-config.json`
+- **Linux** `$HOME/.config/Code/User/globalStorage/vscode-redhat-telemetry/cache/telemetry-config.json`
+
+This allows Red Hat extensions to limit the events to be sent, by including or excluding certain events, by name or containing properties, or by limiting the ratio of users sending data.
+eg.:
+- 50% of `redhat.vscode-hypothetical` users only, to report error events, excluding stackoverflows:
+
+```json
+{
+    "*": {
+        "enabled":"all", // supports "all", "error", "crash", "off"
+        "refresh": "12h",
+        "includes": [
+            {
+                "name" : "*"
+            }
+        ]
+    },
+    "redhat.vscode-hypothetical": {
+        "enabled": "error", 
+        "ratio": "0.5",
+        "excludes": [
+            {
+                "property": "error",
+                "value": "*stackoverflow*"
+            }
+        ]
+    }
+}
+```
+
+Extension configuration inherits and overrides the `*` configuration.
 
 
 # How to use this library
@@ -43,7 +82,7 @@ Unless your extension already depends on a telemetry-enabled Red Hat extension, 
           "type": "boolean",
           "default": null,
           "markdownDescription": "Enable usage data and errors to be sent to Red Hat servers. Read our [privacy statement](https://developers.redhat.com/article/tool-data-collection).",
-          "tags":[ "telemetry" ],
+          "tags":[ "telemetry", "usesOnlineServices" ],
           "scope": "window"
         },
       }
@@ -113,8 +152,11 @@ Once telemetry is in place, you need to document the extent of the telemetry col
 
 * add a reference to your telemetry documentation page to this repository's own [USAGE_DATA.md](https://github.com/redhat-developer/vscode-redhat-telemetry/blob/HEAD/USAGE_DATA.md#other-extensions).
 
-### Turn on logging during development
-In your `.vscode/launch.json`, set the `VSCODE_REDHAT_TELEMETRY_DEBUG` environment variable to `true`:
+### Checking telemetry during development
+In your `.vscode/launch.json`:
+- set the `VSCODE_REDHAT_TELEMETRY_DEBUG` environment variable to `true`, to log telemetry events in the console
+- set the `REDHAT_TELEMETRY_REMOTE_CONFIG_URL` environment variable to the URL of a remote configuration file, if you need to test remote configuration 
+
 ```json
 {
   "name": "Run Extension",
@@ -128,10 +170,12 @@ In your `.vscode/launch.json`, set the `VSCODE_REDHAT_TELEMETRY_DEBUG` environme
   ],
   "preLaunchTask": "${defaultBuildTask}",
   "env": {
-    "VSCODE_REDHAT_TELEMETRY_DEBUG":"true"
+    "VSCODE_REDHAT_TELEMETRY_DEBUG":"true",
+    "REDHAT_TELEMETRY_REMOTE_CONFIG_URL":"https://gist.githubusercontent.com/fbricon/cff82f0bd7ff69bf2b9f5f04b1accc50/raw/65b61b7d8845c842a90a8e6a90d852af34934160/telemetry-config.json"
   }
 },
 ```
+
 
 # How to use from a VS Code webview
 From a VS Code webview, since you can not rely on accessing the filesystem, you need to instanciate the `TelemetryService` from a `TelemetryServiceBuilder`, providing browser-specific implementations of services for collecting data. 

@@ -10,4 +10,9 @@ export interface TelemetrySettings {
    * Returns `true` if Telemetry is configured (enabled or not).
    */
   isTelemetryConfigured(): boolean;
+
+  /**
+   * Returns the telemetry level: value can be either "off", "all", "error" or "crash"
+   */
+  getTelemetryLevel(): string | undefined;
 }
