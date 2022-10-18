@@ -37,4 +37,4 @@ Red Hat extensions' specific telemetry collection details can be found there:
 * [Debug Adapter for Apache Camel](https://github.com/camel-tooling/camel-dap-client-vscode/blob/main/USAGE_DATA.md)
 * [Tools for MicroProfile](https://github.com/redhat-developer/vscode-microprofile/blob/master/USAGE_DATA.md)
 * [XML](https://github.com/redhat-developer/vscode-xml/blob/master/USAGE_DATA.md)
-* [Yaml](https://github.com/redhat-developer/vscode-yaml/blob/main/USAGE_DATA.md)
+* [YAML](https://github.com/redhat-developer/vscode-yaml/blob/main/USAGE_DATA.md)
