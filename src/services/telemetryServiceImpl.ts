@@ -62,6 +62,7 @@ export class TelemetryServiceImpl implements TelemetryService {
     event = enhance(event, this.environment);
     let payload = {
       userId: await this.idManager.getRedHatUUID(),
+      type: event.type,
       event: event.name,
       properties: event.properties,
       measures: event.measures,
