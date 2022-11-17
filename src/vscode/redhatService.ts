@@ -27,6 +27,7 @@ const RETRY_OPTIN_DELAY_IN_MS = 24 * 60 * 60 * 1000; // 24h
 export async function getRedHatService(context: ExtensionContext): Promise<RedHatService> {
   const extensionInfo = getExtension(context);
   const extensionId = extensionInfo.id;
+  Logger.extId = extensionId;
   const packageJson = getPackageJson(extensionInfo);
   const settings = new VSCodeSettings();
   const idManager = IdManagerFactory.getIdManager();

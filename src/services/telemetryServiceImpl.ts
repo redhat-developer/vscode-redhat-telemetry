@@ -62,7 +62,6 @@ export class TelemetryServiceImpl implements TelemetryService {
     event = enhance(event, this.environment);
     let payload = {
       userId: await this.idManager.getRedHatUUID(),
-      type: event.type,
       event: event.name,
       properties: event.properties,
       measures: event.measures,
@@ -73,7 +72,7 @@ export class TelemetryServiceImpl implements TelemetryService {
     //Check against Extension configuration
     const config = await this.configurationManager?.getExtensionConfiguration();
     if (!config || config.canSend(payload)) {
-      return this.reporter.report(payload);
+      return this.reporter.report(payload, event.type);
     }
   }
 

@@ -12,11 +12,10 @@ export class Reporter {
   constructor(private analytics?: Analytics, private cacheService?: CacheService) {
   }
 
-  public async report(event: AnalyticsEvent): Promise<void> {
+  public async report(event: AnalyticsEvent, type: string = 'track'): Promise<void> {
     if (!this.analytics) {
       return;
     }
-    const type = (event.type) ? event.type : 'track';
     const payloadString = JSON.stringify(event);
     switch (type) {
       case 'identify':
