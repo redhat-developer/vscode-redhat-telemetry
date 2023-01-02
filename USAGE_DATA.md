@@ -38,3 +38,4 @@ Red Hat extensions' specific telemetry collection details can be found there:
 * [Tools for MicroProfile](https://github.com/redhat-developer/vscode-microprofile/blob/master/USAGE_DATA.md)
 * [XML](https://github.com/redhat-developer/vscode-xml/blob/master/USAGE_DATA.md)
 * [YAML](https://github.com/redhat-developer/vscode-yaml/blob/main/USAGE_DATA.md)
+* [Ansible](https://github.com/ansible/vscode-ansible/blob/main/USAGE_DATA.md)
