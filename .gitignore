@@ -4,3 +4,5 @@ lib
 .DS_Store
 .nyc_output
 coverage
+dist/foo.bundle.js.LICENSE.txt
+dist/foo.bundle.js

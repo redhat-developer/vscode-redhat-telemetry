@@ -1,6 +1,6 @@
 name: CI Build
 
-# Controls when the action will run. Triggers the workflow on pushed tags 
+# Controls when the action will run. Triggers the workflow on pushed tags
 on:
   pull_request:
     branches:
@@ -40,3 +40,6 @@ jobs:
 
     - name: Test
       run: npm test
+
+    - name: Test packaging
+      run: npm run package
