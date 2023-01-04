@@ -54,7 +54,7 @@ suite('Test configuration manager', () => {
     });
 
     afterEach(() => {
-        env[ConfigurationManager.EMBEDDED_CONFIG_KEY] = undefined;
+        env[ConfigurationManager.TEST_CONFIG_KEY] = undefined;
         mockAxios.reset();
         mockAxios.restore();
         mockFS.restore();
@@ -133,7 +133,7 @@ suite('Test configuration manager', () => {
     
     test('Should read embedded config', async () => {
         mockFS.restore();
-        env[ConfigurationManager.EMBEDDED_CONFIG_KEY] = '../tests/config/telemetry-config.json';
+        env[ConfigurationManager.TEST_CONFIG_KEY] = 'true';
         mockAxios.reset();
         mockAxios.onGet(DEFAULT_CONFIG_URL).reply(404); 
         

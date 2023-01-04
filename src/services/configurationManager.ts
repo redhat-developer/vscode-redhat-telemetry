@@ -8,7 +8,7 @@ export const TELEMETRY_CONFIG = "telemetry-config.json";
 
 export class ConfigurationManager {
     public static REMOTE_CONFIG_KEY = 'REDHAT_TELEMETRY_REMOTE_CONFIG_URL';
-    public static EMBEDDED_CONFIG_KEY = 'REDHAT_TELEMETRY_EMBEDDED_CONFIG_PATH';
+    public static TEST_CONFIG_KEY = 'REDHAT_TELEMETRY_TEST_CONFIG_KEY';
 
     constructor(private extensionId: string, private storageService: FileSystemStorageService){}
 
@@ -88,9 +88,11 @@ export class ConfigurationManager {
     }
 
     public async getEmbeddedConfiguration(): Promise<any> {
-        const envPath = env[ConfigurationManager.EMBEDDED_CONFIG_KEY];
-        let configPath = (envPath)? envPath : '../config/'+TELEMETRY_CONFIG;
-        return require(`${configPath}`); //inject as a string to prevent webpack from complaining
+        const testConfig = env[ConfigurationManager.TEST_CONFIG_KEY];
+        if (testConfig) {
+            return require('../tests/config/telemetry-config.json');// hard-coded to keep webpack happy
+        }
+        return require('../config/telemetry-config.json');
     }
 
 }
