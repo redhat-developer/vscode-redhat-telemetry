@@ -90,7 +90,7 @@ export class ConfigurationManager {
     public async getEmbeddedConfiguration(): Promise<any> {
         const envPath = env[ConfigurationManager.EMBEDDED_CONFIG_KEY];
         let configPath = (envPath)? envPath : '../config/'+TELEMETRY_CONFIG;
-        return require(configPath);
+        return require(`${configPath}`); //inject as a string to prevent webpack from complaining
     }
 
 }
