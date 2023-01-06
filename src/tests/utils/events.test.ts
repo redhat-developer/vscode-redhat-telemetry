@@ -34,7 +34,7 @@ suite('Test events enhancements', () => {
         assert.strictEqual(betterEvent.properties.extension_version, '1.2.3');
         assert.strictEqual(betterEvent.properties.foo, 'bar');
         assert.strictEqual(betterEvent.context.ip, '0.0.0.0');
-        
+
     });
 
     test('should anonymize data', async () => {
@@ -45,7 +45,7 @@ suite('Test events enhancements', () => {
                 qty: 10,
                 active: false,
                 bar: 'That c:\\Fred\\bar looks like a path',
-                error: 'An error occured in /Users/Fred/foo/bar.txt! But we\'re fine',
+                error: 'An error occurred in /Users/Fred/foo/bar.txt! But we\'re fine',
                 multiline: 'That url file://Fred/bar.txt is gone!\nNot that c:\\user\\bar though',
                 obj: {
                     q: 'Who is Fred?',
@@ -60,7 +60,7 @@ suite('Test events enhancements', () => {
         assert.strictEqual(betterEvent.properties.active, false);
         assert.strictEqual(betterEvent.properties.foo, '_username_ is _username_');
         assert.strictEqual(betterEvent.properties.bar, 'That c:\\_username_\\bar looks like a path');
-        assert.strictEqual(betterEvent.properties.error, 'An error occured in /Users/_username_/foo/bar.txt! But we\'re fine');
+        assert.strictEqual(betterEvent.properties.error, 'An error occurred in /Users/_username_/foo/bar.txt! But we\'re fine');
         assert.strictEqual(betterEvent.properties.multiline, 'That url file://_username_/bar.txt is gone!\nNot that c:\\user\\bar though');
         assert.strictEqual(betterEvent.properties.obj.q, 'Who is _username_?');
         assert.strictEqual(betterEvent.properties.obj.a, '_username_ who?');

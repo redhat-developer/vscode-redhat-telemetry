@@ -31,8 +31,8 @@ function getPlatform(): string {
 }
 async function getDistribution(): Promise<string|undefined> {
     if (os.platform() === 'linux') {
-      const platorm = await promisify(getos)() as LinuxOs;
-      return platorm.dist;
+      const platform = await promisify(getos)() as LinuxOs;
+      return platform.dist;
     }
     return undefined;
 }

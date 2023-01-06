@@ -2,8 +2,8 @@ import { Environment } from '../interfaces/environment';
 import { TelemetryEvent } from '../interfaces/telemetry';
 
 /**
- * Enhances a `TelemetryEvent` by injecting environmental data to its properties and context 
- * 
+ * Enhances a `TelemetryEvent` by injecting environmental data to its properties and context
+ *
  * See segment.com fields: https://segment.com/docs/connections/spec/common/#integrations
  * {
   "anonymousId": "507f191e810c19729de860ea",
@@ -88,7 +88,7 @@ import { TelemetryEvent } from '../interfaces/telemetry';
   "userId": "97980cfea0067",
   "version": 2
 }
- * 
+ *
  * @param event the event to enhance
  * @param environment the environment data to inject the event with
  */
@@ -109,7 +109,7 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
       properties.app_remote = environment.application.remote;
     }
   }
-  
+
   const traits = event.traits ? sanitize(event.traits, environment) : {};
   if (event.type == 'identify') {
     //All those traits should be handled by Woopra in the context block, but are not. Meh.
@@ -120,7 +120,7 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
     traits.locale = environment.locale;
   }
 
-  //Inject Plateform specific data in segment's context, so it can be recognized by the end destination
+  //Inject Platform specific data in segment's context, so it can be recognized by the end destination
   // XXX Currently, Woopra ignores app, os, locale and timezone
   const context = event.context ? event.context : {};
   context.ip = '0.0.0.0';
@@ -134,8 +134,8 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
   };
   context.locale = environment.locale;
   context.location = {
-    // This is inacurate in some cases (user uses a different locale than from his actual country), 
-    // but still provides an interesting metric in most cases. 
+    // This is inaccurate in some cases (user uses a different locale than from his actual country),
+    // but still provides an interesting metric in most cases.
     country: environment.country
   };
   context.timezone = environment.timezone;
@@ -165,7 +165,7 @@ function sanitize(properties: any, environment: Environment) : any {
     }
     const isObj = isObject(rawProperty);
     let sanitizedProperty = isObj? JSON.stringify(rawProperty) : rawProperty;
-    
+
     sanitizedProperty = (sanitizedProperty as string).replace(usernameRegexp,'_username_');
     if (isObj) {
       //let's try to deserialize into a sanitized object
@@ -174,7 +174,7 @@ function sanitize(properties: any, environment: Environment) : any {
       } catch(e) {
         //We messed up, we'll return the sanitized string instead
       }
-    } 
+    }
     sanitized[p] = sanitizedProperty;
   }
   return sanitized;
