@@ -1,17 +1,28 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { ConfigurationChangeEvent, Disposable, env, ExtensionContext, window, workspace } from "vscode";
+import * as fs from "fs";
+import * as path from "path";
+import {
+  ConfigurationChangeEvent,
+  Disposable,
+  env,
+  ExtensionContext,
+  window,
+  workspace,
+} from "vscode";
 import { TelemetryService, TelemetryServiceBuilder } from "..";
 import { RedHatService } from "../interfaces/redhatService";
-import { ConfigurationManager } from '../services/configurationManager';
-import { FileSystemCacheService } from '../services/fileSystemCacheService';
+import { ConfigurationManager } from "../services/configurationManager";
+import { FileSystemCacheService } from "../services/fileSystemCacheService";
 import { IdManagerFactory } from "../services/idManagerFactory";
-import { getExtensionId, loadPackageJson } from '../utils/extensions';
+import { getExtensionId, loadPackageJson } from "../utils/extensions";
 import { Logger } from "../utils/logger";
 import { getEnvironment } from "../node/platform";
-import { DEFAULT_SEGMENT_DEBUG_KEY, DEFAULT_SEGMENT_KEY, OPT_OUT_INSTRUCTIONS_URL, PRIVACY_STATEMENT_URL } from './constants';
-import { didUserDisableTelemetry, VSCodeSettings } from './settings';
-
+import {
+  DEFAULT_SEGMENT_DEBUG_KEY,
+  DEFAULT_SEGMENT_KEY,
+  OPT_OUT_INSTRUCTIONS_URL,
+  PRIVACY_STATEMENT_URL,
+} from "./constants";
+import { didUserDisableTelemetry, VSCodeSettings } from "./settings";
 
 const RETRY_OPTIN_DELAY_IN_MS = 24 * 60 * 60 * 1000; // 24h
 
@@ -20,24 +31,28 @@ const RETRY_OPTIN_DELAY_IN_MS = 24 * 60 * 60 * 1000; // 24h
  * - A preference listener enables/disables  telemetry based on changes to `redhat.telemetry.enabled`
  * - If `redhat.telemetry.enabled` is not set, a popup requesting telemetry opt-in will be displayed
  * - when the extension is deactivated, a telemetry shutdown event will be emitted (if telemetry is enabled)
- *  
+ *
  * @param context the extension's context
  * @returns a Promise of RedHatService
  */
-export async function getRedHatService(context: ExtensionContext): Promise<RedHatService> {
+export async function getRedHatService(
+  context: ExtensionContext,
+): Promise<RedHatService> {
   const extensionInfo = getExtension(context);
   const extensionId = extensionInfo.id;
   Logger.extId = extensionId;
   const packageJson = getPackageJson(extensionInfo);
   const settings = new VSCodeSettings();
   const idManager = IdManagerFactory.getIdManager();
-  const cachePath = path.resolve(getTelemetryWorkingDir(context), 'cache');
+  const cachePath = path.resolve(getTelemetryWorkingDir(context), "cache");
   const cacheService = new FileSystemCacheService(cachePath);
   const builder = new TelemetryServiceBuilder(packageJson)
     .setSettings(settings)
     .setIdManager(idManager)
     .setCacheService(cacheService)
-    .setConfigurationManager(new ConfigurationManager(extensionId, cacheService))
+    .setConfigurationManager(
+      new ConfigurationManager(extensionId, cacheService),
+    )
     .setEnvironment(await getEnvironment(extensionId, packageJson.version));
 
   const telemetryService = await builder.build();
@@ -45,36 +60,45 @@ export async function getRedHatService(context: ExtensionContext): Promise<RedHa
   // register disposable to send shutdown event
   context.subscriptions.push(shutdownHook(telemetryService));
 
-  // register preference listener for that extension, 
+  // register preference listener for that extension,
   // so it stops/starts sending data when redhat.telemetry.enabled changes
   context.subscriptions.push(onDidChangeTelemetryEnabled(telemetryService));
 
   openTelemetryOptInDialogIfNeeded(context, extensionId, settings);
 
   telemetryService.send({
-    type: 'identify',
-    name: 'identify'
+    type: "identify",
+    name: "identify",
   });
 
   return {
     getTelemetryService: () => Promise.resolve(telemetryService),
-    getIdManager: () => Promise.resolve(idManager)
-  }
+    getIdManager: () => Promise.resolve(idManager),
+  };
 }
 
-function onDidChangeTelemetryEnabled(telemetryService: TelemetryService): Disposable {
+function onDidChangeTelemetryEnabled(
+  telemetryService: TelemetryService,
+): Disposable {
   return workspace.onDidChangeConfiguration(
     //as soon as user changed the redhat.telemetry setting, we consider
     //opt-in (or out) has been set, so whichever the choice is, we flush the queue
     (e: ConfigurationChangeEvent) => {
-      if (e.affectsConfiguration("redhat.telemetry") || e.affectsConfiguration("telemetry")) {
+      if (
+        e.affectsConfiguration("redhat.telemetry") ||
+        e.affectsConfiguration("telemetry")
+      ) {
         telemetryService.flushQueue();
       }
-    }
+    },
   );
 }
 
-async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, extensionId:string, settings: VSCodeSettings) {
+async function openTelemetryOptInDialogIfNeeded(
+  context: ExtensionContext,
+  extensionId: string,
+  settings: VSCodeSettings,
+) {
   if (settings.isTelemetryConfigured() || didUserDisableTelemetry()) {
     return;
   }
@@ -82,13 +106,16 @@ async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, exten
   let popupInfo: PopupInfo | undefined;
 
   const parentDir = getTelemetryWorkingDir(context);
-  const optinPopupInfo = path.resolve(parentDir, 'redhat.optin.json');
+  const optinPopupInfo = path.resolve(parentDir, "redhat.optin.json");
   if (fs.existsSync(optinPopupInfo)) {
-    const rawdata = fs.readFileSync(optinPopupInfo, { encoding: 'utf8' });
+    const rawdata = fs.readFileSync(optinPopupInfo, { encoding: "utf8" });
     popupInfo = JSON.parse(rawdata);
   }
   if (popupInfo) {
-    if (popupInfo.sessionId !== env.sessionId || popupInfo.owner !== extensionId) {
+    if (
+      popupInfo.sessionId !== env.sessionId ||
+      popupInfo.owner !== extensionId
+    ) {
       //someone else is showing the popup, bail.
       return;
     }
@@ -96,14 +123,16 @@ async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, exten
     popupInfo = {
       owner: extensionId,
       sessionId: env.sessionId,
-      time: new Date().getTime() //for troubleshooting purposes
-    }
+      time: new Date().getTime(), //for troubleshooting purposes
+    };
     if (!fs.existsSync(parentDir)) {
       fs.mkdirSync(parentDir, { recursive: true });
     }
     fs.writeFileSync(optinPopupInfo, JSON.stringify(popupInfo));
     context.subscriptions.push({
-      dispose: () => { safeCleanup(optinPopupInfo); }
+      dispose: () => {
+        safeCleanup(optinPopupInfo);
+      },
     });
   }
 
@@ -111,16 +140,21 @@ async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, exten
     Read our [privacy statement](${PRIVACY_STATEMENT_URL}?from=${extensionId}) 
   and learn how to [opt out](${OPT_OUT_INSTRUCTIONS_URL}?from=${extensionId}).`;
 
-  const retryOptin = setTimeout(openTelemetryOptInDialogIfNeeded, RETRY_OPTIN_DELAY_IN_MS, context, settings);
+  const retryOptin = setTimeout(
+    openTelemetryOptInDialogIfNeeded,
+    RETRY_OPTIN_DELAY_IN_MS,
+    context,
+    settings,
+  );
   let selection: string | undefined;
   try {
-    selection = await window.showInformationMessage(message, 'Accept', 'Deny');
+    selection = await window.showInformationMessage(message, "Accept", "Deny");
     if (!selection) {
       //close was chosen. Ask next time.
       return;
     }
     clearTimeout(retryOptin);
-    settings.updateTelemetryEnabledConfig(selection === 'Accept');
+    settings.updateTelemetryEnabledConfig(selection === "Accept");
   } finally {
     if (selection) {
       safeCleanup(optinPopupInfo);
@@ -129,11 +163,11 @@ async function openTelemetryOptInDialogIfNeeded(context: ExtensionContext, exten
 }
 
 interface ExtensionInfo {
-  id:string,
-  packageJSON: any
+  id: string;
+  packageJSON: any;
 }
 
-function getExtension(context: ExtensionContext): ExtensionInfo  {
+function getExtension(context: ExtensionContext): ExtensionInfo {
   if (context.extension) {
     return context.extension;
   }
@@ -141,7 +175,7 @@ function getExtension(context: ExtensionContext): ExtensionInfo  {
   const packageJson = loadPackageJson(context.extensionPath);
   const info = {
     id: getExtensionId(packageJson),
-    packageJSON: packageJson
+    packageJSON: packageJson,
   };
   return info;
 }
@@ -158,7 +192,7 @@ function getPackageJson(extension: ExtensionInfo): any {
 }
 
 interface PopupInfo {
-  owner: string,
+  owner: string;
   sessionId: string;
   time: number;
 }
@@ -166,7 +200,7 @@ interface PopupInfo {
 function safeCleanup(filePath: string) {
   try {
     fs.unlinkSync(filePath);
-  } catch (err : any) {
+  } catch (err: any) {
     Logger.log(err);
   }
   Logger.log(`Deleted ${filePath}`);
@@ -177,11 +211,14 @@ function shutdownHook(telemetryService: TelemetryService): Disposable {
     dispose: async () => {
       await telemetryService.sendShutdownEvent();
       await telemetryService.dispose();
-    }
+    },
   };
 }
 
 function getTelemetryWorkingDir(context: ExtensionContext): string {
-  return path.resolve(context.globalStorageUri.fsPath, '..', 'vscode-redhat-telemetry');
+  return path.resolve(
+    context.globalStorageUri.fsPath,
+    "..",
+    "vscode-redhat-telemetry",
+  );
 }
-

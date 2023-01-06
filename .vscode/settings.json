@@ -1,0 +1,11 @@
+{
+  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.exclude": {
+    ".nyc_output": true,
+    "coverage": true,
+    "lib": true
+  }
+}

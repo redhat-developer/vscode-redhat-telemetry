@@ -9,6 +9,8 @@
     "copy-files": "copyfiles -u 1 src/config/* src/tests/config/* lib/",
     "compile": "tsc -p .",
     "build": "npm run clean && npm run copy-files && npm run compile",
+    "lint": "python3 -m pre_commit run -a",
+    "prepare": "python3 -m pip install --user pre-commit",
     "prepublish": "npm run build",
     "coverage": "nyc -r lcov -e .ts -x \"*.ts\" npm run test",
     "test": "mocha -r ts-node/register --ui tdd \"src/tests/**/*.test.ts\"",

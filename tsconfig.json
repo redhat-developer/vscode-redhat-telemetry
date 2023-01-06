@@ -6,9 +6,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "lib": [
-      "es6"
-    ],
+    "lib": ["es6"],
     "allowJs": true,
     "outDir": "./lib",
     "strict": true,
@@ -16,7 +14,5 @@
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
