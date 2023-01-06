@@ -1,6 +1,6 @@
 {
   "name": "@redhat-developer/vscode-redhat-telemetry",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Provides Telemetry APIs for Red Hat applications",
   "main": "lib/index.js",
   "types": "lib",
@@ -12,7 +12,7 @@
     "prepublish": "npm run build",
     "coverage": "nyc -r lcov -e .ts -x \"*.ts\" npm run test",
     "test": "mocha -r ts-node/register --ui tdd \"src/tests/**/*.test.ts\"",
-    "package": "npm run compile && webpack"
+    "package": "npm run build && webpack"
   },
   "files": [
     "/lib"

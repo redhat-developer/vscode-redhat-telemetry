@@ -1,12 +1,13 @@
-import * as os from 'os';
+import os from 'os';
 import osLocale from 'os-locale';
 import getos from 'getos';
 import { LinuxOs } from 'getos';
 import { Environment } from '..';
-import { env, UIKind, version} from 'vscode';
+import { env as vscodeEnv , UIKind, version} from 'vscode';
 import { promisify } from 'util';
-import process from 'process';
-import { getCountry } from './geolocation';
+
+import { getCountry } from '../utils/geolocation';
+import env from '../interfaces/envVar';
 
 export const PLATFORM = getPlatform();
 export const DISTRO = getDistribution();
@@ -43,10 +44,10 @@ export async function getEnvironment(extensionId: string, extensionVersion:strin
             version:extensionVersion,
         },
         application: {
-            name: env.appName,
+            name: vscodeEnv.appName,
             version: version,
             uiKind: UI_KIND,
-            remote: env.remoteName !== undefined
+            remote: vscodeEnv.remoteName !== undefined
         },
         platform:{
             name:PLATFORM,
@@ -60,7 +61,7 @@ export async function getEnvironment(extensionId: string, extensionVersion:strin
     };
 }
 function getUIKind():string {
-    switch (env.uiKind) {
+    switch (vscodeEnv.uiKind) {
         case UIKind.Desktop:
             return 'Desktop';
         case UIKind.Web:
@@ -71,15 +72,14 @@ function getUIKind():string {
 }
 
 function getUsername(): string | undefined {
-    const pEnv = process.env;
 
     let username = (
-        pEnv.SUDO_USER ||
-        pEnv.C9_USER /* Cloud9 */ ||
-        pEnv.LOGNAME ||
-        pEnv.USER ||
-        pEnv.LNAME ||
-        pEnv.USERNAME
+        env.SUDO_USER ||
+        env.C9_USER /* Cloud9 */ ||
+        env.LOGNAME ||
+        env.USER ||
+        env.LNAME ||
+        env.USERNAME
     );
     if (!username) {
         try {
@@ -88,3 +88,4 @@ function getUsername(): string | undefined {
     }
     return username;
 }
+

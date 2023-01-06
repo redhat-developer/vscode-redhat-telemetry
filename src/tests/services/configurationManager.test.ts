@@ -4,10 +4,10 @@ import mockFS from 'mock-fs';
 import * as fs from 'fs';
 import MockAdapter from 'axios-mock-adapter';
 import { afterEach, beforeEach } from "mocha";
-import { env } from "process";
 import { ConfigurationManager, DEFAULT_CONFIG_URL, TELEMETRY_CONFIG } from "../../services/configurationManager";
 import { FileSystemStorageService } from "../../services/FileSystemStorageService";
 import path from "path";
+import env from "../../interfaces/envVar";
 
 suite('Test configuration manager', () => {
 

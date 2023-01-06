@@ -1,4 +1,5 @@
 import { IdManager } from "..";
+import env from "../interfaces/envVar";
 import { UUID } from "../utils/uuid";
 
 let userId: string;
@@ -13,7 +14,7 @@ export class GitpodIdManager implements IdManager {
 
     loadRedHatUUID(redhatDir?: string): string {
         try {
-            const email = process.env.GITPOD_GIT_USER_EMAIL;
+            const email = env.GITPOD_GIT_USER_EMAIL;
             if (email) {
                 userId = UUID.generateUUID(email);
                 const anonymousIdFile = UUID.getAnonymousIdFile(redhatDir);

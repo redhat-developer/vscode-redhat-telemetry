@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { ConfigurationChangeEvent, Disposable, env, Extension, ExtensionContext, window, workspace } from "vscode";
+import { ConfigurationChangeEvent, Disposable, env, ExtensionContext, window, workspace } from "vscode";
 import { TelemetryService, TelemetryServiceBuilder } from "..";
 import { RedHatService } from "../interfaces/redhatService";
 import { ConfigurationManager } from '../services/configurationManager';
@@ -8,7 +8,7 @@ import { FileSystemCacheService } from '../services/fileSystemCacheService';
 import { IdManagerFactory } from "../services/idManagerFactory";
 import { getExtensionId, loadPackageJson } from '../utils/extensions';
 import { Logger } from "../utils/logger";
-import { getEnvironment } from "../utils/platform-node";
+import { getEnvironment } from "../node/platform";
 import { DEFAULT_SEGMENT_DEBUG_KEY, DEFAULT_SEGMENT_KEY, OPT_OUT_INSTRUCTIONS_URL, PRIVACY_STATEMENT_URL } from './constants';
 import { didUserDisableTelemetry, VSCodeSettings } from './settings';
 

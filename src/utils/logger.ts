@@ -1,4 +1,6 @@
-export let doLog: boolean = (typeof process !== 'undefined')?process.env.VSCODE_REDHAT_TELEMETRY_DEBUG === 'true': false;
+import envVars from "../interfaces/envVar";
+
+export let doLog: boolean = envVars.VSCODE_REDHAT_TELEMETRY_DEBUG === 'true';
 
 // This exists only for testing purposes. Could delete later.
 const VERSION = require('../../package.json').version;

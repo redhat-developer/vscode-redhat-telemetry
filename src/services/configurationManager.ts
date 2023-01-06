@@ -1,7 +1,7 @@
 import { Configuration } from "./configuration";
 import axios from 'axios';
-import { env } from "process";
 import { FileSystemStorageService } from "./FileSystemStorageService";
+import env from "../interfaces/envVar";
 
 export const DEFAULT_CONFIG_URL =  'https://raw.githubusercontent.com/redhat-developer/vscode-redhat-telemetry/main/src/config/telemetry-config.json';
 export const TELEMETRY_CONFIG = "telemetry-config.json";
