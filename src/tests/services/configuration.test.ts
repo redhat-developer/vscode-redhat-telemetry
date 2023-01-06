@@ -1,123 +1,132 @@
 import assert from "assert";
 import { AnalyticsEvent } from "../../services/AnalyticsEvent";
 import { Configuration } from "../../services/configuration";
-import { v4 } from 'uuid';
+import { v4 } from "uuid";
 import { hashCode, numValue } from "../../utils/hashcode";
-suite('Test configurations', () => {
+suite("Test configurations", () => {
+  const all = {
+    enabled: "all",
+    includes: [
+      {
+        name: "*",
+      },
+    ],
+  };
 
-    const all = {
-        "enabled": "all",
-        "includes": [
-            {
-                "name": "*"
-            }
-        ]
-    };
+  const identify = {
+    enabled: "all",
+    includes: [
+      {
+        name: "identify",
+      },
+    ],
+  };
 
-    const identify = {
-        "enabled": "all",
-        "includes": [
-            {
-                "name": "identify"
-            }
-        ]
-    };
+  const off = {
+    enabled: "off",
+    includes: [
+      {
+        name: "*",
+      },
+    ],
+  };
 
-    const off = {
-        "enabled": "off",
-        "includes": [
-            {
-                "name": "*"
-            }
-        ]
-    };
+  const errors = {
+    enabled: "error",
+    excludes: [
+      {
+        property: "error",
+        value: "*stackoverflow*",
+      },
+    ],
+  };
 
-    const errors = {
-        "enabled": "error",
-        "excludes": [
-            {
-                "property": "error",
-                "value": "*stackoverflow*"
-            }
-        ]
-    }
+  const ratioed = {
+    ratio: "0.3",
+  };
 
-    const ratioed = {
-        "ratio":"0.3"
-    };
+  test("Should allow all events", async () => {
+    const config = new Configuration(all);
+    let event = { event: "something" } as AnalyticsEvent;
+    assert.ok(config.canSend(event) === true);
+  });
 
+  test("Should not allow any events", async () => {
+    const config = new Configuration(off);
+    let event = { event: "something" } as AnalyticsEvent;
+    assert.ok(config.canSend(event) === false);
+  });
 
-    test('Should allow all events', async () => {
-        const config = new Configuration(all);
-        let event = { event: "something" } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === true);
-    });
+  test("Should filter events by name", async () => {
+    const config = new Configuration(identify);
+    let event = {
+      event: "identify",
+    } as AnalyticsEvent;
+    assert.ok(config.canSend(event) === true);
+    event = {
+      event: "startup",
+    } as AnalyticsEvent;
+    assert.ok(config.canSend(event) === false);
+  });
 
-    test('Should not allow any events', async () => {
-        const config = new Configuration(off);
-        let event = { event: "something" } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === false);
-    });
+  test("Should only allow errors", async () => {
+    const config = new Configuration(errors);
+    let event = {
+      event: "startup",
+    } as AnalyticsEvent;
+    assert.ok(
+      config.canSend(event) === false,
+      `${event.event} shouldn't be sent`,
+    );
+    event = {
+      event: "failed-analysis",
+      properties: {
+        error: "Ohoh, an error occurred!",
+      },
+    } as AnalyticsEvent;
+    assert.ok(config.canSend(event) === true, `${event.event} should be sent`);
+    event = {
+      event: "crash-analysis",
+      properties: {
+        error: "Bla bla stackoverflow bla",
+      },
+    } as AnalyticsEvent;
+    assert.ok(
+      config.canSend(event) === false,
+      `${event.event} shouldn't be sent`,
+    );
+  });
 
-    test('Should filter events by name', async () => {
-        const config = new Configuration(identify);
-        let event = {
-            event: "identify"
-         } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === true);
-        event = {
-            event: "startup"
-        } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === false);
-    });
+  test("Should only allow errors", async () => {
+    const config = new Configuration(errors);
+    let event = {
+      event: "startup",
+    } as AnalyticsEvent;
+    assert.ok(
+      config.canSend(event) === false,
+      `${event.event} shouldn't be sent`,
+    );
+    event = {
+      event: "failed-analysis",
+      properties: {
+        error: "Ohoh, an error occurred!",
+      },
+    } as AnalyticsEvent;
+    assert.ok(config.canSend(event) === true, `${event.event} should be sent`);
+    event = {
+      event: "crash-analysis",
+      properties: {
+        error: "Bla bla stackoverflow bla",
+      },
+    } as AnalyticsEvent;
+    assert.ok(
+      config.canSend(event) === false,
+      `${event.event} shouldn't be sent`,
+    );
+  });
 
-    test('Should only allow errors', async () => {
-        const config = new Configuration(errors);
-        let event = {
-            event: "startup"
-         } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
-        event = {
-            event: "failed-analysis",
-            properties: {
-                "error": "Ohoh, an error occurred!"
-            }
-        } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === true, `${event.event} should be sent`);
-        event = {
-            event: "crash-analysis",
-            properties: {
-                "error": "Bla bla stackoverflow bla"
-            }
-        } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
-    });
-
-    test('Should only allow errors', async () => {
-        const config = new Configuration(errors);
-        let event = {
-            event: "startup"
-         } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
-        event = {
-            event: "failed-analysis",
-            properties: {
-                "error": "Ohoh, an error occurred!"
-            }
-        } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === true, `${event.event} should be sent`);
-        event = {
-            event: "crash-analysis",
-            properties: {
-                "error": "Bla bla stackoverflow bla"
-            }
-        } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
-    });
-
-
-    test('Should apply ratio on userId', async () => {
-        /*
+  test("Should apply ratio on userId", async () => {
+    /*
         d0b7ac12-caa0-4253-8087-788ff0b1c293 hashcode:-1654400659 numvalue:0.59
         8668869d-a068-412b-9e59-4fec9dc0483a hashcode:-1782924593 numvalue:0.93
         8b7fe10d-bb9d-434c-afed-4fb03f3b626e hashcode:1373002981 numvalue:0.81
@@ -130,21 +139,27 @@ suite('Test configurations', () => {
         cd304b68-3512-4af5-8991-377479bfede6 hashcode:-449137339 numvalue:0.39
         */
 
-        const config = new Configuration(ratioed);
-        let event = {
-            userId: "d0b7ac12-caa0-4253-8087-788ff0b1c293", //numvalue:0.59 > 0.3
-            event: "startup"
-         } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
-        event = {
-            userId: "533629ec-091b-474b-95e6-3aa0eef3e940",//numvalue:0.22 < 0.3
-            event: "startup",
-        } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === true, `${event.event} should be sent`);
-        event = {
-            userId: "cd304b68-3512-4af5-8991-377479bfede6",//numvalue:0.39 > 0.3
-            event: "startup",
-        } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
-    });
+    const config = new Configuration(ratioed);
+    let event = {
+      userId: "d0b7ac12-caa0-4253-8087-788ff0b1c293", //numvalue:0.59 > 0.3
+      event: "startup",
+    } as AnalyticsEvent;
+    assert.ok(
+      config.canSend(event) === false,
+      `${event.event} shouldn't be sent`,
+    );
+    event = {
+      userId: "533629ec-091b-474b-95e6-3aa0eef3e940", //numvalue:0.22 < 0.3
+      event: "startup",
+    } as AnalyticsEvent;
+    assert.ok(config.canSend(event) === true, `${event.event} should be sent`);
+    event = {
+      userId: "cd304b68-3512-4af5-8991-377479bfede6", //numvalue:0.39 > 0.3
+      event: "startup",
+    } as AnalyticsEvent;
+    assert.ok(
+      config.canSend(event) === false,
+      `${event.event} shouldn't be sent`,
+    );
+  });
 });

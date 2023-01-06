@@ -1,13 +1,13 @@
-import { Reporter } from './reporter';
-import { Logger } from '../utils/logger';
-import { TelemetrySettings } from '../interfaces/settings';
-import { TelemetryEventQueue } from '../utils/telemetryEventQueue';
-import { TelemetryService, TelemetryEvent } from '../interfaces/telemetry';
-import { CacheService } from '../interfaces/cacheService';
-import { ConfigurationManager } from './configurationManager';
-import { IdManager } from '../interfaces/idManager';
-import { Environment } from '../interfaces/environment';
-import { enhance, isError } from '../utils/events';
+import { Reporter } from "./reporter";
+import { Logger } from "../utils/logger";
+import { TelemetrySettings } from "../interfaces/settings";
+import { TelemetryEventQueue } from "../utils/telemetryEventQueue";
+import { TelemetryService, TelemetryEvent } from "../interfaces/telemetry";
+import { CacheService } from "../interfaces/cacheService";
+import { ConfigurationManager } from "./configurationManager";
+import { IdManager } from "../interfaces/idManager";
+import { Environment } from "../interfaces/environment";
+import { enhance, isError } from "../utils/events";
 
 /**
  * Implementation of a `TelemetryService`
@@ -15,12 +15,14 @@ import { enhance, isError } from '../utils/events';
 export class TelemetryServiceImpl implements TelemetryService {
   private startTime: number;
 
-  constructor(private reporter: Reporter, 
-              private queue: TelemetryEventQueue | undefined, 
-              private settings: TelemetrySettings, 
-              private idManager: IdManager, 
-              private environment: Environment,
-              private configurationManager?: ConfigurationManager) {
+  constructor(
+    private reporter: Reporter,
+    private queue: TelemetryEventQueue | undefined,
+    private settings: TelemetrySettings,
+    private idManager: IdManager,
+    private environment: Environment,
+    private configurationManager?: ConfigurationManager,
+  ) {
     this.startTime = this.getCurrentTimeInSeconds();
   }
 
@@ -43,19 +45,22 @@ export class TelemetryServiceImpl implements TelemetryService {
 
   public async sendStartupEvent(): Promise<void> {
     this.startTime = this.getCurrentTimeInSeconds();
-    return this.send({ name: 'startup' });
+    return this.send({ name: "startup" });
   }
   public async sendShutdownEvent(): Promise<void> {
-    return this.send({ name: 'shutdown', properties: {
-      //Sends session duration in seconds
-      session_duration: this.getCurrentTimeInSeconds() - this.startTime
-    } });
+    return this.send({
+      name: "shutdown",
+      properties: {
+        //Sends session duration in seconds
+        session_duration: this.getCurrentTimeInSeconds() - this.startTime,
+      },
+    });
   }
 
   private async sendEvent(event: TelemetryEvent): Promise<void> {
     //Check against VS Code settings
     const level = this.settings.getTelemetryLevel();
-    if (level && ["error","crash"].includes(level) && !isError(event)) {
+    if (level && ["error", "crash"].includes(level) && !isError(event)) {
       return;
     }
 
@@ -66,7 +71,7 @@ export class TelemetryServiceImpl implements TelemetryService {
       properties: event.properties,
       measures: event.measures,
       traits: event.traits,
-      context: event.context
+      context: event.context,
     };
 
     //Check against Extension configuration
@@ -95,9 +100,8 @@ export class TelemetryServiceImpl implements TelemetryService {
     return this.reporter.flush();
   }
 
-
   private getCurrentTimeInSeconds(): number {
     const now = Date.now();
-    return Math.floor(now/1000);
+    return Math.floor(now / 1000);
   }
 }

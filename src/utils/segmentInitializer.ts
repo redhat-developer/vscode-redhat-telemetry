@@ -1,19 +1,18 @@
-import { Logger } from './logger';
-import Analytics from 'analytics-node';
-import { getExtensionId } from './extensions';
+import { Logger } from "./logger";
+import Analytics from "analytics-node";
+import { getExtensionId } from "./extensions";
 
 const IS_DEBUG = startedInDebugMode();
 
 let DEFAULT_SEGMENT_KEY: string | undefined;
 
 export namespace SegmentInitializer {
-  
   export function initialize(clientPackageJson: any): Analytics | undefined {
     let segmentWriteKey = getSegmentKey(clientPackageJson);
     if (!segmentWriteKey) {
       //Using the default key
       if (!DEFAULT_SEGMENT_KEY) {
-        const defaultPackageJson = require('../../package.json');
+        const defaultPackageJson = require("../../package.json");
         DEFAULT_SEGMENT_KEY = getSegmentKey(defaultPackageJson);
       }
       segmentWriteKey = DEFAULT_SEGMENT_KEY;
@@ -31,7 +30,9 @@ export namespace SegmentInitializer {
       });
       return analytics;
     } else {
-      Logger.log('Missing segmentWriteKey from package.json OR package.json in vscode-commons');
+      Logger.log(
+        "Missing segmentWriteKey from package.json OR package.json in vscode-commons",
+      );
       return undefined;
     }
   }
@@ -44,20 +45,22 @@ function startedInDebugMode(): boolean {
 
 // exported for tests
 function hasDebugFlag(args: string[]): boolean {
-  return args 
+  return (
+    args &&
     // See https://nodejs.org/en/docs/guides/debugging-getting-started/
-    && args.some(arg => /^--inspect/.test(arg) || /^--debug/.test(arg));
+    args.some((arg) => /^--inspect/.test(arg) || /^--debug/.test(arg))
+  );
 }
 
 function getSegmentKey(packageJson: any): string | undefined {
   const extensionId = getExtensionId(packageJson);
-  let keyKey = 'segmentWriteKeyDebug';
+  let keyKey = "segmentWriteKeyDebug";
   try {
     let clientSegmentKey: string | undefined = undefined;
     if (IS_DEBUG) {
       clientSegmentKey = packageJson[keyKey];
     } else {
-      keyKey = 'segmentWriteKey';
+      keyKey = "segmentWriteKey";
       clientSegmentKey = packageJson[keyKey];
     }
     if (clientSegmentKey) {

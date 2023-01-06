@@ -1,5 +1,5 @@
-import { Environment } from '../interfaces/environment';
-import { TelemetryEvent } from '../interfaces/telemetry';
+import { Environment } from "../interfaces/environment";
+import { TelemetryEvent } from "../interfaces/telemetry";
 
 /**
  * Enhances a `TelemetryEvent` by injecting environmental data to its properties and context
@@ -92,14 +92,19 @@ import { TelemetryEvent } from '../interfaces/telemetry';
  * @param event the event to enhance
  * @param environment the environment data to inject the event with
  */
-export const IGNORED_USERS = ['user', 'gitpod', 'theia']
+export const IGNORED_USERS = ["user", "gitpod", "theia"];
 
-export function enhance(event: TelemetryEvent, environment: Environment): TelemetryEvent {
+export function enhance(
+  event: TelemetryEvent,
+  environment: Environment,
+): TelemetryEvent {
   //Inject Client name and version,  Extension id and version, and timezone to the event properties
-  const properties = event.properties ? sanitize(event.properties, environment) : {};
-  if (!(event.type) || event.type == 'track') {
-    properties.extension_name = environment.extension.name
-    properties.extension_version = environment.extension.version
+  const properties = event.properties
+    ? sanitize(event.properties, environment)
+    : {};
+  if (!event.type || event.type == "track") {
+    properties.extension_name = environment.extension.name;
+    properties.extension_version = environment.extension.version;
     properties.app_name = environment.application.name;
     properties.app_version = environment.application.version;
     if (environment.application.uiKind) {
@@ -111,7 +116,7 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
   }
 
   const traits = event.traits ? sanitize(event.traits, environment) : {};
-  if (event.type == 'identify') {
+  if (event.type == "identify") {
     //All those traits should be handled by Woopra in the context block, but are not. Meh.
     traits.timezone = environment.timezone;
     traits.os_name = environment.platform.name;
@@ -123,10 +128,10 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
   //Inject Platform specific data in segment's context, so it can be recognized by the end destination
   // XXX Currently, Woopra ignores app, os, locale and timezone
   const context = event.context ? event.context : {};
-  context.ip = '0.0.0.0';
+  context.ip = "0.0.0.0";
   context.app = {
     name: environment.application.name,
-    version: environment.application.version
+    version: environment.application.version,
   };
   context.os = {
     name: environment.platform.name,
@@ -136,7 +141,7 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
   context.location = {
     // This is inaccurate in some cases (user uses a different locale than from his actual country),
     // but still provides an interesting metric in most cases.
-    country: environment.country
+    country: environment.country,
   };
   context.timezone = environment.timezone;
 
@@ -146,16 +151,20 @@ export function enhance(event: TelemetryEvent, environment: Environment): Teleme
     properties: properties,
     measures: event.measures,
     traits: traits,
-    context: context
+    context: context,
   };
   return enhancedEvent;
 }
 
-function sanitize(properties: any, environment: Environment) : any {
-  const sanitized:any = {};
-  let usernameRegexp: RegExp|undefined;
-  if (environment.username && environment.username.length > 3 && !IGNORED_USERS.includes(environment.username)) {
-    usernameRegexp = new RegExp(environment.username, 'g');
+function sanitize(properties: any, environment: Environment): any {
+  const sanitized: any = {};
+  let usernameRegexp: RegExp | undefined;
+  if (
+    environment.username &&
+    environment.username.length > 3 &&
+    !IGNORED_USERS.includes(environment.username)
+  ) {
+    usernameRegexp = new RegExp(environment.username, "g");
   }
   for (const p in properties) {
     const rawProperty = properties[p];
@@ -164,14 +173,17 @@ function sanitize(properties: any, environment: Environment) : any {
       continue;
     }
     const isObj = isObject(rawProperty);
-    let sanitizedProperty = isObj? JSON.stringify(rawProperty) : rawProperty;
+    let sanitizedProperty = isObj ? JSON.stringify(rawProperty) : rawProperty;
 
-    sanitizedProperty = (sanitizedProperty as string).replace(usernameRegexp,'_username_');
+    sanitizedProperty = (sanitizedProperty as string).replace(
+      usernameRegexp,
+      "_username_",
+    );
     if (isObj) {
       //let's try to deserialize into a sanitized object
       try {
         sanitizedProperty = JSON.parse(sanitizedProperty);
-      } catch(e) {
+      } catch (e) {
         //We messed up, we'll return the sanitized string instead
       }
     }
@@ -180,14 +192,16 @@ function sanitize(properties: any, environment: Environment) : any {
   return sanitized;
 }
 
-function isObject(test:any):boolean {
+function isObject(test: any): boolean {
   return test === Object(test);
 }
 
-export function isError(event:any):boolean {
+export function isError(event: any): boolean {
   return event.properties?.error || event.properties?.errors;
 }
 
-function isNonStringPrimitive(test:any) {
-  return typeof test !== "string" && !(test instanceof String) && !isObject(test);
+function isNonStringPrimitive(test: any) {
+  return (
+    typeof test !== "string" && !(test instanceof String) && !isObject(test)
+  );
 }

@@ -1,0 +1,16 @@
+---
+ci:
+  autoupdate_commit_msg: "chore: pre-commit autoupdate"
+  autoupdate_schedule: monthly
+  autofix_commit_msg: |
+    chore: auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+minimum_pre_commit_version: 2.9.0 # types_or
+repos:
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    # keep it before markdownlint and eslint
+    rev: "v3.0.0-alpha.4"
+    hooks:
+      - id: prettier
+        types_or: ["markdown", "json", "ts"]
