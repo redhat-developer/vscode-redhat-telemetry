@@ -1,8 +1,8 @@
-import { TelemetryEvent } from "../interfaces/telemetry";
+import { TelemetryEvent } from "../common/api/telemetry";
 import {
   TelemetryEventQueue,
   MAX_QUEUE_SIZE,
-} from "../utils/telemetryEventQueue";
+} from "../common/impl/telemetryEventQueue";
 import * as assert from "assert";
 
 let dummyEvent: TelemetryEvent = { name: "test" };

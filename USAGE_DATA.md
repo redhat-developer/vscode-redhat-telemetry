@@ -13,7 +13,11 @@ Telemetry requests may contain:
 * the OS name and version (and distribution name, in case of Linux)
 * the user locale (eg. en_US)
 * the user timezone
-* the country id ( as determined by the current timezone)
+* the country id (as determined by the current timezone)
+
+Also, when running in a web extension:
+* the browser name and version
+* the host service, eg. `vscode.dev`
 
 Common events are reported:
 

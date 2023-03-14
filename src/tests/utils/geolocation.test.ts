@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { getCountry } from '../../utils/geolocation';
+import { getCountry } from '../../common/utils/geolocation';
 
 suite('Test get country from timezone', () => {
     test('known country', async () => {

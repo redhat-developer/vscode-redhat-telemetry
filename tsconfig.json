@@ -1,22 +1,11 @@
 {
-  "compilerOptions": {
-    "target": "ES6",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "lib": [
-      "es6"
-    ],
-    "allowJs": true,
-    "outDir": "./lib",
-    "strict": true,
-    "noImplicitAny": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true
-  },
-  "include": [
-    "src"
-  ]
+	"files": [],
+	"references": [
+		{
+			"path": "./tsconfig.browser.json"
+		},
+		{
+			"path": "./tsconfig.node.json"
+		}
+	]
 }

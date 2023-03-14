@@ -1,7 +1,7 @@
-import * as utils from '../../utils/events';
+import * as utils from '../../common/utils/events';
 import * as assert from 'assert';
-import { Environment } from '../../interfaces/environment';
-import { TelemetryEvent } from '../..';
+import { Environment } from '../../common/api/environment';
+import { TelemetryEvent } from '../../common/api/telemetry';
 
 const env: Environment = {
     application: {
@@ -18,6 +18,8 @@ const env: Environment = {
     },
 }
 
+const USER_ID = "1234";
+
 suite('Test events enhancements', () => {
     test('should inject environment data', async () => {
         const event: TelemetryEvent = {
@@ -27,7 +29,7 @@ suite('Test events enhancements', () => {
             }
         }
 
-        const betterEvent = utils.enhance(event, env);
+        const betterEvent = utils.transform(event, USER_ID, env);
         assert.strictEqual(betterEvent.properties.app_name, 'SuperCode');
         assert.strictEqual(betterEvent.properties.app_version, '6.6.6');
         assert.strictEqual(betterEvent.properties.extension_name, 'my-ext');
@@ -54,7 +56,7 @@ suite('Test events enhancements', () => {
             }
         }
 
-        const betterEvent = utils.enhance(event, env);
+        const betterEvent = utils.transform(event, USER_ID, env);
 
         assert.strictEqual(betterEvent.properties.qty, 10);
         assert.strictEqual(betterEvent.properties.active, false);
@@ -91,7 +93,7 @@ suite('Test events enhancements', () => {
                 }
             }
 
-            const betterEvent = utils.enhance(event, cheEnv);
+            const betterEvent = utils.transform(event, USER_ID, cheEnv);
             assert.strictEqual(betterEvent.properties.foo, event.properties.foo);
             assert.strictEqual(betterEvent.properties.multiline, event.properties.multiline);
         });
