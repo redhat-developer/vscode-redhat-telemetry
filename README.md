@@ -135,7 +135,7 @@ if (telemetryService) {
 
 To access the anonymous Red Hat UUID for the current user:
 ```typescript
-const redhatUuid = await (await redhatService.getIdManager()).getRedHatUUID();
+const redhatUuid = await (await redhatService.getIdProvider()).getRedHatUUID();
 ```
 
 Once your extension is deactivated, a shutdown event, including the session duration, will automatically be sent on its behalf. However, shutdown event delivery is not guaranteed, in case VS Code is faster to exit than to send those last events.
@@ -177,30 +177,36 @@ In your `.vscode/launch.json`:
 ```
 
 
-# How to use from a VS Code webview
-From a VS Code webview, since you can not rely on accessing the filesystem, you need to instanciate the `TelemetryService` from a `TelemetryServiceBuilder`, providing browser-specific implementations of services for collecting data. 
+# How to use from a VS Code web extension
+When the VS Code extension runs as a web extension, telemetry should use a webworker specific API. So just change your code so it imports from the dedicated webworker namespace. 
 
-To get a reference to the TelemetryService instance for your VS Code extension:
 ```typescript
-import { TelemetryServiceBuilder, TelemetryService, TelemetrySettings, Environment, IdManager } from "@redhat-developer/vscode-redhat-telemetry";
-...
-const packageJson: any = ...; // an object defining `{publisher:string, name:string, version:string, segmentWriteKey:string}` 
-const idManager: IdManager = ...; // a service returning Red Hat anonymous UUID
-const environment: Environment = ...; // an object containing environment specific data (OS, locale...)
-const settings:TelemetrySettings = ...;  // an object checking whether telemetry collection is enabled
-const telemetryService: TelemetryService = new TelemetryServiceBuilder(packageJson)
-                                             .setIdManager(idManager) 
-                                             .setEnvironment(environment) 
-                                             .setSettings(settings)
-...
-let event = {
-    type: "track",
-    name: "Test Event",
-};
-telemetryService.send(event);
+import { getRedHatService, TelemetryService} from "@redhat-developer/vscode-redhat-telemetry/webworker";
+```
 
-//To access the RedHat UUID for the current user:
-const REDHAT_UUID = idManager.getRedHatUUID();
+The API is identical to the regular node one.
+
+However, in order for webpack to compile your web extension, some adjustments are required to the alias and fallback properties:
+
+```js
+/**@type {import('webpack').Configuration}*/
+const webConfig = {
+  target: 'webworker', // extensions run in a webworker context
+  ...
+  resolve: {
+    ...
+    alias: {
+      'node-fetch': 'whatwg-fetch',
+      'object-hash': 'object-hash/dist/object_hash.js',
+    },
+    fallback: {
+      path: require.resolve('path-browserify'),
+      'node-fetch': require.resolve('whatwg-fetch'),
+      util: require.resolve('util'),
+    },
+  },
+  ...
+};
 ```
 
 # Build

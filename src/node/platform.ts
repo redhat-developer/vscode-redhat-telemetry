@@ -1,19 +1,19 @@
 import os from 'os';
-import osLocale from 'os-locale';
+import { osLocaleSync } from 'os-locale';
 import getos from 'getos';
 import { LinuxOs } from 'getos';
-import { Environment } from '..';
-import { env as vscodeEnv , UIKind, version} from 'vscode';
+import { getCountry } from '../common/utils/geolocation';
+import { Environment } from '../common/api/environment';
+import { env as vscodeEnv, UIKind, version } from 'vscode';
 import { promisify } from 'util';
 
-import { getCountry } from '../utils/geolocation';
-import env from '../interfaces/envVar';
+import env from '../common/envVar';
 
 export const PLATFORM = getPlatform();
 export const DISTRO = getDistribution();
 export const PLATFORM_VERSION = os.release();
 export const TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
-export const LOCALE = osLocale.sync().replace('_', '-');
+export const LOCALE = osLocaleSync().replace('_', '-');
 export const COUNTRY = getCountry(TIMEZONE);
 export const UI_KIND = getUIKind();
 export const USERNAME = getUsername();
@@ -29,38 +29,39 @@ function getPlatform(): string {
     }
     return platform.charAt(0).toUpperCase() + platform.slice(1);
 }
-async function getDistribution(): Promise<string|undefined> {
+async function getDistribution(): Promise<string | undefined> {
     if (os.platform() === 'linux') {
-      const platform = await promisify(getos)() as LinuxOs;
-      return platform.dist;
+        const platorm = await promisify(getos)() as LinuxOs;
+        return platorm.dist;
     }
     return undefined;
 }
 
-export async function getEnvironment(extensionId: string, extensionVersion:string): Promise<Environment> {
+export async function getEnvironment(extensionId: string, extensionVersion: string): Promise<Environment> {
     return {
         extension: {
-            name:extensionId,
-            version:extensionVersion,
+            name: extensionId,
+            version: extensionVersion,
         },
         application: {
             name: vscodeEnv.appName,
             version: version,
             uiKind: UI_KIND,
-            remote: vscodeEnv.remoteName !== undefined
+            remote: vscodeEnv.remoteName !== undefined,
+            appHost: vscodeEnv.appHost
         },
-        platform:{
-            name:PLATFORM,
-            version:PLATFORM_VERSION,
+        platform: {
+            name: PLATFORM,
+            version: PLATFORM_VERSION,
             distribution: await DISTRO
         },
-        timezone:TIMEZONE,
-        locale:LOCALE,
+        timezone: TIMEZONE,
+        locale: LOCALE,
         country: COUNTRY,
         username: USERNAME
     };
 }
-function getUIKind():string {
+function getUIKind(): string {
     switch (vscodeEnv.uiKind) {
         case UIKind.Desktop:
             return 'Desktop';
@@ -84,7 +85,7 @@ function getUsername(): string | undefined {
     if (!username) {
         try {
             username = os.userInfo().username;
-        } catch (_) {}
+        } catch (_) { }
     }
     return username;
 }

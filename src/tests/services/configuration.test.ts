@@ -1,8 +1,6 @@
-import assert from "assert";
-import { AnalyticsEvent } from "../../services/AnalyticsEvent";
-import { Configuration } from "../../services/configuration";
-import { v4 } from 'uuid';
-import { hashCode, numValue } from "../../utils/hashcode";
+import * as assert from "assert";
+import { AnalyticsEvent } from "../../common/api/analyticsEvent";
+import { Configuration } from "../../common/impl/configuration";
 suite('Test configurations', () => {
 
     const all = {
