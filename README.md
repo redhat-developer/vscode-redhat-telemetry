@@ -181,7 +181,7 @@ In your `.vscode/launch.json`:
 When the VS Code extension runs as a web extension, telemetry should use a webworker specific API. So just change your code so it imports from the dedicated webworker namespace. 
 
 ```typescript
-import { getRedHatService, TelemetryService} from "@redhat-developer/vscode-redhat-telemetry/webworker";
+import { getRedHatService, TelemetryService} from "@redhat-developer/vscode-redhat-telemetry/lib/webworker";
 ```
 
 The API is identical to the regular node one.
