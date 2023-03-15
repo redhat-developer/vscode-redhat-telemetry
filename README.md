@@ -223,4 +223,4 @@ to build the library
 # Information on data transmission during development
 
 When the extension sending telemetry is running in `development mode`, the data are sent to the `test.vscode` project on https://segment.com/, or whatever project bound to the optional [segmentWriteDebugKey](#optional-add-a-custom-segment-key-in-packagejson-file).
-As the transmission is opt-in, unless specifiying it explicitely, no data are transmitted during CI build.
+As the transmission is opt-in, unless specifiying it explicitely, no data are transmitted during CI builds.
