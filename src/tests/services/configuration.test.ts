@@ -44,10 +44,18 @@ suite('Test configurations', () => {
         "ratio":"0.3"
     };
 
-
-    test('Should allow all events', async () => {
+    const ratioedEvent = {
+        "excludes": [
+            {
+                "name": "verbose-event",
+                "ratio": "0.7"
+            }
+        ]
+    };
+    
+    test('Should allow all events****', async () => {
         const config = new Configuration(all);
-        let event = { event: "something" } as AnalyticsEvent;
+        let event = { event: "something", userId: "abcd"} as AnalyticsEvent;
         assert.ok(config.canSend(event) === true);
     });
 
@@ -60,11 +68,13 @@ suite('Test configurations', () => {
     test('Should filter events by name', async () => {
         const config = new Configuration(identify);
         let event = {
-            event: "identify"
+            userId: "abcd",
+            event: "identify",
          } as AnalyticsEvent;
         assert.ok(config.canSend(event) === true);
         event = {
-            event: "startup"
+            userId: "abcd",
+            event: "startup",
         } as AnalyticsEvent;
         assert.ok(config.canSend(event) === false);
     });
@@ -72,10 +82,12 @@ suite('Test configurations', () => {
     test('Should only allow errors', async () => {
         const config = new Configuration(errors);
         let event = {
-            event: "startup"
+            userId: "abcd",
+            event: "startup",
          } as AnalyticsEvent;
         assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
         event = {
+            userId: "abcd",
             event: "failed-analysis",
             properties: {
                 "error": "Ohoh, an error occurred!"
@@ -83,6 +95,7 @@ suite('Test configurations', () => {
         } as AnalyticsEvent;
         assert.ok(config.canSend(event) === true, `${event.event} should be sent`);
         event = {
+            userId: "abcd",
             event: "crash-analysis",
             properties: {
                 "error": "Bla bla stackoverflow bla"
@@ -90,29 +103,6 @@ suite('Test configurations', () => {
         } as AnalyticsEvent;
         assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
     });
-
-    test('Should only allow errors', async () => {
-        const config = new Configuration(errors);
-        let event = {
-            event: "startup"
-         } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
-        event = {
-            event: "failed-analysis",
-            properties: {
-                "error": "Ohoh, an error occurred!"
-            }
-        } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === true, `${event.event} should be sent`);
-        event = {
-            event: "crash-analysis",
-            properties: {
-                "error": "Bla bla stackoverflow bla"
-            }
-        } as AnalyticsEvent;
-        assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
-    });
-
 
     test('Should apply ratio on userId', async () => {
         /*
@@ -144,5 +134,33 @@ suite('Test configurations', () => {
             event: "startup",
         } as AnalyticsEvent;
         assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
+    });
+
+    test('Should apply ratio on event', async () => {
+        const config = new Configuration(ratioedEvent);
+        let event = {
+            userId: "8668869d-a068-412b-9e59-4fec9dc0483a",
+            event: "startup"
+         } as AnalyticsEvent;
+        assert.ok(config.canSend(event) === true, `${event.event} should be sent`);
+
+        event = {
+            userId: "ceef2ce6-72e1-4ebf-9493-8df2d84b3eb9",
+            event: "startup",
+        } as AnalyticsEvent;
+        assert.ok(config.canSend(event) === true, `${event.event} should be sent`);
+
+        event = {
+            userId: "533629ec-091b-474b-95e6-3aa0eef3e940",//numvalue:0.22 < (1- 0.7)
+            event: "verbose-event",
+        } as AnalyticsEvent;
+        assert.ok(config.canSend(event) === true, `${event.event} should be sent`);
+
+
+        event = {
+            userId: "cd304b68-3512-4af5-8991-377479bfede6",//numvalue:0.39 > (1 -0.7)
+            event: "verbose-event",
+        } as AnalyticsEvent;
+        assert.ok(config.canSend(event) === false, `${event.event} should not be sent`);
     });
 });
