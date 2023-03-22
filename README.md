@@ -33,6 +33,8 @@ This allows Red Hat extensions to limit the events to be sent, by including or e
 eg.:
 - 50% of `redhat.vscode-hypothetical` users only, to report error events, excluding stackoverflows:
 
+Starting with 0.6.1, you can configure ratios on included events, meaning X% of the users will send a particular event (does not mean X% of the events will be sent!).
+
 ```json
 {
     "*": {
@@ -46,11 +48,29 @@ eg.:
     },
     "redhat.vscode-hypothetical": {
         "enabled": "error", 
-        "ratio": "0.5",
+        "ratio": "0.5", // 50% of the users will send data
         "excludes": [
             {
                 "property": "error",
                 "value": "*stackoverflow*"
+            }
+        ]
+    },
+    "redhat.vscode-mythological": {
+        "enabled": "all", 
+        "includes": [
+            {
+                "name": "something-too-frequent",
+                "ratio":"0.1" // 10% of the users will send that event
+            },
+            {
+                "name": "something-less-frequent",// all users could send that event but ...
+            }
+        ],
+        "excludes": [
+            {
+                "name": "something-less-frequent",
+                "ratio":"0.9" //... actually 90% of the users won't send that event
             }
         ]
     }
