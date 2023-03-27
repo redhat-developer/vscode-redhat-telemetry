@@ -1,5 +1,8 @@
 import os from 'os';
-import { osLocaleSync } from 'os-locale';
+// Can't use os-locale 6.x as it's an ESM module, incompatible with running VS Code electron tests
+// See https://github.com/redhat-developer/vscode-redhat-telemetry/issues/30
+//import { osLocaleSync } from 'os-locale';
+import osLocaleSync from 'os-locale';
 import getos from 'getos';
 import { LinuxOs } from 'getos';
 import { getCountry } from '../common/utils/geolocation';
@@ -13,7 +16,8 @@ export const PLATFORM = getPlatform();
 export const DISTRO = getDistribution();
 export const PLATFORM_VERSION = os.release();
 export const TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
-export const LOCALE = osLocaleSync().replace('_', '-');
+//export const LOCALE = osLocaleSync().replace('_', '-');
+export const LOCALE = osLocaleSync.sync().replace('_', '-');
 export const COUNTRY = getCountry(TIMEZONE);
 export const UI_KIND = getUIKind();
 export const USERNAME = getUsername();

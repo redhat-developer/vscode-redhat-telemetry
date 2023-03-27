@@ -62,7 +62,7 @@
     "getos": "^3.2.1",
     "picomatch": "^2.3.1",
     "object-hash": "^3.0.0",
-    "os-locale": "^6.0.2",
+    "os-locale": "^5.0.0",
     "uuid": "^9.0.0",
     "ua-parser-js": "1.0.33"
   }
