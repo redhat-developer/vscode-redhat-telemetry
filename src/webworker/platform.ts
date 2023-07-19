@@ -6,14 +6,6 @@ import env from '../common/envVar';
 import UAParser from 'ua-parser-js';
 
 let userAgentInfo : UAParser.IResult;
-export const PLATFORM = getPlatform();
-export const DISTRO = getDistribution();
-export const PLATFORM_VERSION = getUAInfo().os.version;
-export const TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
-export const LOCALE = navigator.language.replace('_', '-');
-export const COUNTRY = getCountry(TIMEZONE);
-export const UI_KIND = getUIKind();
-export const USERNAME = getUsername();
 
 function getUAInfo() {
     if (userAgentInfo) {
@@ -104,3 +96,11 @@ function getUsername(): string | undefined {
     return username;
 }
 
+export const PLATFORM = getPlatform();
+export const DISTRO = getDistribution();
+export const PLATFORM_VERSION = getUAInfo().os.version;
+export const TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
+export const LOCALE = navigator.language.replace('_', '-');
+export const COUNTRY = getCountry(TIMEZONE);
+export const UI_KIND = getUIKind();
+export const USERNAME = getUsername();
