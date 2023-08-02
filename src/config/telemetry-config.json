@@ -7,5 +7,14 @@
                 "name" : "*"
             }
         ]
+    },
+    "redhat.java": {
+        "enabled": "all",
+        "includes": [
+            {
+                "name": "textCompletion",
+                "ratio": "0.3"
+            }
+        ]
     }
 }
