@@ -70,7 +70,7 @@ Starting with 0.6.1, you can configure ratios on included events, meaning X% of 
         "excludes": [
             {
                 "name": "something-less-frequent",
-                "ratio":"0.9" //... actually 90% of the users won't send that event
+                "ratio":"0.997" //... actually 99.7% of the users won't send that event
             }
         ]
     }
