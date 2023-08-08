@@ -10,10 +10,10 @@
     },
     "redhat.java": {
         "enabled": "all",
-        "includes": [
+        "excludes": [
             {
                 "name": "textCompletion",
-                "ratio": "0.3"
+                "ratio": "0.7"
             }
         ]
     }
