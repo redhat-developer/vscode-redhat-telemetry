@@ -18,8 +18,8 @@ export function numValue(value: string): number {
         return num;
     }
     const hash = Math.abs(hashCode(value)).toString();
-    const x = Math.min(2, hash.length);
-    num = parseFloat(hash.substring(hash.length - x)) / 100;
+    const x = Math.min(4, hash.length);
+    num = parseFloat(hash.substring(hash.length - x)) / 10000;
     cache.set(value, num);
     return num;
 }

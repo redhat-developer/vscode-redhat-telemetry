@@ -1,6 +1,6 @@
 {
   "name": "@redhat-developer/vscode-redhat-telemetry",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Provides Telemetry APIs for Red Hat applications",
   "main": "lib/index.js",
   "types": "lib",
@@ -41,7 +41,7 @@
     "chai": "^4.3.6",
     "copyfiles": "^2.4.1",
     "mocha": "10.1.0",
-    "ts-mocha":"10.0.0",
+    "ts-mocha": "10.0.0",
     "mock-fs": "^5.1.4",
     "nyc": "^15.1.0",
     "rimraf": "^3.0.2",
