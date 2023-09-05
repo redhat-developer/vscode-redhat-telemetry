@@ -13,7 +13,7 @@
         "excludes": [
             {
                 "name": "textCompletion",
-                "ratio": "0.7"
+                "ratio": "0.997"
             }
         ]
     }
