@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@segment/analytics-node": "0.0.1-beta.17",
-    "axios": "^1.3.2",
+    "axios": "^1.6.0",
     "countries-and-timezones": "^3.4.1",
     "getos": "^3.2.1",
     "picomatch": "^2.3.1",
