@@ -88,8 +88,8 @@ suite('Test events enhancements', () => {
             const event: TelemetryEvent = {
                 name:'Something',
                 properties: {
-                    foo: 'user likes theia',
-                    multiline: 'That gitpod \nusername is woke',
+                    foo: 'vscode likes theia',
+                    multiline: 'That gitpod \nusername is a redhat user',
                 }
             }
 
@@ -97,5 +97,38 @@ suite('Test events enhancements', () => {
             assert.strictEqual(betterEvent.properties.foo, event.properties.foo);
             assert.strictEqual(betterEvent.properties.multiline, event.properties.multiline);
         });
+    });
+
+    test('should not anonymize technical properties', async () => {
+        const someEnv: Environment = {
+            application: {
+                name:'codename',
+                version:'codename'
+            },
+            extension: {
+                name: 'codename',
+                version: 'codename'
+            },
+            username: 'codename',
+            platform: {
+                name: 'codename'
+            },
+        }
+
+        const event: TelemetryEvent = {
+            name:'Something',
+            properties: {
+                foo: 'codename likes vscode',
+                multiline: 'That gitpod \ncodename is a redhat user',
+            }
+        }
+
+        const betterEvent = utils.transform(event, USER_ID, someEnv);
+        assert.strictEqual(betterEvent.properties.extension_name, someEnv.extension.name);
+        assert.strictEqual(betterEvent.properties.extension_version, someEnv.extension.version);
+        assert.strictEqual(betterEvent.properties.app_name, someEnv.application.name);
+        assert.strictEqual(betterEvent.properties.app_version, someEnv.application.version);
+        assert.strictEqual(betterEvent.properties.foo, '_username_ likes vscode');
+        assert.strictEqual(betterEvent.properties.multiline, 'That gitpod \n_username_ is a redhat user');
     });
 });

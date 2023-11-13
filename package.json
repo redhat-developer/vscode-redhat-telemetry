@@ -1,6 +1,6 @@
 {
   "name": "@redhat-developer/vscode-redhat-telemetry",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Provides Telemetry APIs for Red Hat applications",
   "main": "lib/index.js",
   "types": "lib",
@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@segment/analytics-node": "0.0.1-beta.17",
-    "axios": "^1.6.0",
+    "axios": "^1.6.1",
     "countries-and-timezones": "^3.4.1",
     "getos": "^3.2.1",
     "picomatch": "^2.3.1",
