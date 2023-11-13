@@ -93,7 +93,8 @@ import { TelemetryEvent } from '../api/telemetry';
  * @param event the event to enhance
  * @param environment the environment data to inject the event with
  */
-export const IGNORED_USERS = ['user', 'gitpod', 'theia']
+export const IGNORED_USERS = ['user', 'gitpod', 'theia', 'vscode', 'redhat']
+export const IGNORED_PROPERTIES = ['extension_name', 'extension_version', 'app_name', 'app_version', 'app_kind', 'app_remote', 'app_host', 'browser_name', 'browser_version', '']
 
 export function transform(event: TelemetryEvent, userId: string, environment: Environment): AnalyticsEvent {
   //Inject Client name and version,  Extension id and version, and timezone to the event properties
@@ -171,7 +172,7 @@ function sanitize(properties: any, environment: Environment): any {
   }
   for (const p in properties) {
     const rawProperty = properties[p];
-    if (!rawProperty || !usernameRegexp || isNonStringPrimitive(rawProperty)) {
+    if (!rawProperty || IGNORED_PROPERTIES.includes(p) || !usernameRegexp || isNonStringPrimitive(rawProperty)) {
       sanitized[p] = rawProperty;
       continue;
     }
