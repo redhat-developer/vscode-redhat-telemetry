@@ -1,6 +1,6 @@
 name: Release to NPM
 
-# Controls when the action will run. Triggers the workflow on pushed tags 
+# Controls when the action will run. Triggers the workflow on pushed tags
 on:
   push:
     tags:
@@ -21,10 +21,10 @@ jobs:
     - uses: actions/checkout@v3
 
       # Set up Node
-    - name: Use Node 16
+    - name: Use Node 18
       uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: 18
         registry-url: 'https://registry.npmjs.org'
 
       # Run install dependencies
