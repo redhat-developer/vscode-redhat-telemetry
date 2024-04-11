@@ -1,8 +1,7 @@
-import { Configuration } from "./configuration";
-import axios from 'axios';
-import { FileSystemStorageService } from "../vscode/fileSystemStorageService";
 import env from "../envVar";
 import { Logger } from "../utils/logger";
+import { FileSystemStorageService } from "../vscode/fileSystemStorageService";
+import { Configuration } from "./configuration";
 
 export const DEFAULT_CONFIG_URL =  'https://raw.githubusercontent.com/redhat-developer/vscode-redhat-telemetry/main/src/config/telemetry-config.json';
 export const TELEMETRY_CONFIG = "telemetry-config.json";
@@ -68,13 +67,13 @@ export class ConfigurationManager {
         let telemetryUri = ( uri )? uri: env[ConfigurationManager.REMOTE_CONFIG_KEY];
         if (!telemetryUri) {
             telemetryUri = DEFAULT_CONFIG_URL;
-        } 
+        }
         Logger.info(`Updating vscode-redhat-telemetry configuration from ${telemetryUri}`);
-        const response = await axios.get(telemetryUri);
+        const response = await fetch(telemetryUri);
         try {
-            return response?.data;
+            return response?.json();
         } catch (e) {
-            console.error(`Failed to parse:\n`+response?.data+'\n'+e);
+            console.error(`Failed to parse:\n`+(await response?.text())+'\n'+e);
         }
         return undefined;
     }
