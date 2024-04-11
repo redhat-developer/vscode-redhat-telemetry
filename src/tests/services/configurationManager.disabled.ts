@@ -1,21 +1,20 @@
 import * as assert from "assert";
-import axios from 'axios';
-import * as mockFS from 'mock-fs';
 import * as fs from 'fs';
-import MockAdapter from 'axios-mock-adapter';
 import { afterEach, beforeEach } from "mocha";
-import { ConfigurationManager, DEFAULT_CONFIG_URL, TELEMETRY_CONFIG } from "../../common/impl/configurationManager";
+import * as mockFS from 'mock-fs';
 import * as path from "path";
-import env from "../../common/envVar";
-import { FileSystemStorageService } from "../../common/vscode/fileSystemStorageService";
 import { Uri } from "vscode";
+import env from "../../common/envVar";
+import { ConfigurationManager, DEFAULT_CONFIG_URL, TELEMETRY_CONFIG } from "../../common/impl/configurationManager";
+import { FileSystemStorageService } from "../../common/vscode/fileSystemStorageService";
 
 //DISABLED as we need to mock VS Code
 suite('Test configuration manager', () => {
 
-    let mockAxios: MockAdapter;
     let configurationManager: ConfigurationManager;
-    
+
+    let realFetch: typeof fetch;
+
     const cacheDir = `${process.cwd()}/extension/cache`;
     const storageService = new FileSystemStorageService(Uri.file(cacheDir));
 
@@ -49,17 +48,23 @@ suite('Test configuration manager', () => {
         mockFS({
                 'extension/cache': {}
         });
+        realFetch = global.fetch;
         configurationManager = new ConfigurationManager('redhat.vscode-hypothetical', storageService);
-        mockAxios = new MockAdapter(axios);
-        mockAxios.onGet(DEFAULT_CONFIG_URL).replyOnce(200, remoteConfig);
+        global.fetch = (url) => {
+            if (url === DEFAULT_CONFIG_URL) {
+                return Promise.resolve(new Response(
+                    Buffer.from(JSON.stringify(remoteConfig)).buffer,
+                    { status: 200 }
+                ));
+            }
+        };
     });
 
     afterEach(() => {
         env[ConfigurationManager.TEST_CONFIG_KEY] = undefined;
-        mockAxios.reset();
-        mockAxios.restore();
+        global.fetch = realFetch;
         mockFS.restore();
-    });   
+    });
 
     test('Should download remote config', async () => {
         const json = await configurationManager.fetchRemoteConfiguration();
@@ -84,7 +89,7 @@ suite('Test configuration manager', () => {
         const referenceTimestamp = config.json.timestamp;
         assert.notStrictEqual(referenceTimestamp, origTimestamp);
         assert.strictEqual(config.json.enabled, 'off');
-        
+
         const configPath = path.join(cacheDir, TELEMETRY_CONFIG);
         const jsonConfig = JSON.parse(fs.readFileSync(configPath, { encoding: 'utf8' }));
         assert.strictEqual(jsonConfig.timestamp, referenceTimestamp);
@@ -97,7 +102,7 @@ suite('Test configuration manager', () => {
         const config1 = await configurationManager.getExtensionConfiguration();
         assert.ok(fs.existsSync(filePath), `${TELEMETRY_CONFIG} should exist`);
         const referenceTimestamp = config1.json.timestamp;
-        
+
         //No http request was made here
         configurationManager = new ConfigurationManager('redhat.vscode-other', storageService);
         const config = await configurationManager.getExtensionConfiguration();
@@ -131,13 +136,19 @@ suite('Test configuration manager', () => {
             ]
         },);
     });
-    
+
     test('Should read embedded config', async () => {
         mockFS.restore();
         env[ConfigurationManager.TEST_CONFIG_KEY] = 'true';
-        mockAxios.reset();
-        mockAxios.onGet(DEFAULT_CONFIG_URL).reply(404); 
-        
+        global.fetch = (url) => {
+            if (url === DEFAULT_CONFIG_URL) {
+                return Promise.resolve(new Response(
+                    undefined,
+                    { status: 404 }
+                ));
+            }
+        };
+
         const config = await configurationManager.getExtensionConfiguration();
         assert.deepStrictEqual(config.json ,{
             "refresh": "2h",
