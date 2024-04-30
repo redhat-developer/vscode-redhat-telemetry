@@ -16,5 +16,14 @@
                 "ratio": "0.997"
             }
         ]
+    },
+    "redhat.vscode-yaml": {
+        "enabled": "all",
+        "ratio": "0.5"
+        "includes": [
+            {
+                "name" : "*"
+            }
+        ]
     }
 }
