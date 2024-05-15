@@ -10,6 +10,7 @@
     },
     "redhat.java": {
         "enabled": "all",
+        "ratio": "0.5",
         "excludes": [
             {
                 "name": "textCompletion",
@@ -18,6 +19,10 @@
         ]
     },
     "redhat.vscode-yaml": {
+        "enabled": "all",
+        "ratio": "0.5"
+    },
+    "redhat.vscode-xml": {
         "enabled": "all",
         "ratio": "0.5"
     }
