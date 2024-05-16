@@ -6,6 +6,12 @@
             {
                 "name" : "*"
             }
+        ],
+        "excludes": [
+            {
+                "name": "shutdown",
+                "ratio": "1.0"
+            }
         ]
     },
     "redhat.java": {
@@ -17,6 +23,10 @@
                 "ratio": "0.997"
             }
         ]
+    },
+    "redhat.fabric8-analytics": {
+        "enabled": "all",
+        "ratio": "0.5"
     },
     "redhat.vscode-yaml": {
         "enabled": "all",
