@@ -34,6 +34,12 @@
     },
     "redhat.vscode-xml": {
         "enabled": "all",
-        "ratio": "0.5"
+        "ratio": "0.5",
+        "excludes": [
+            {
+                "name": "server.document.open",
+                "ratio":"0.9"
+            }
+        ]
     }
 }
