@@ -19,6 +19,7 @@ export class RedHatServiceNodeProvider extends AbstractRedHatServiceProvider {
     const reporter = new Reporter(this.getSegmentApi(packageJson), new EventCacheService(storageService));
     const idManager = IdManagerFactory.getIdManager();
     const builder = new TelemetryServiceBuilder(packageJson)
+      .setContext(this.context)
       .setSettings(this.settings)
       .setIdProvider(idManager)
       .setReporter(reporter)

@@ -7,20 +7,26 @@ import { IdProvider } from '../api/idProvider';
 import { Environment } from '../api/environment';
 import { transform, isError } from '../utils/events';
 import { IReporter } from '../api/reporter';
+import { EventTracker } from './eventTracker';
+import { Memento } from 'vscode';
 
 /**
  * Implementation of a `TelemetryService`
  */
 export class TelemetryServiceImpl implements TelemetryService {
   private startTime: number;
+  private eventTracker: EventTracker;
 
-  constructor(private reporter: IReporter, 
+  constructor(globalState: Memento,
+              private reporter: IReporter, 
               private queue: TelemetryEventQueue | undefined, 
               private settings: TelemetrySettings, 
               private idManager: IdProvider, 
               private environment: Environment,
-              private configurationManager?: ConfigurationManager) {
+              private configurationManager?: ConfigurationManager
+            ) {
     this.startTime = this.getCurrentTimeInSeconds();
+    this.eventTracker = new EventTracker(globalState);
   }
 
   /* 
@@ -64,7 +70,25 @@ export class TelemetryServiceImpl implements TelemetryService {
     //Check against Extension configuration
     const config = await this.configurationManager?.getExtensionConfiguration();
     if (!config || config.canSend(payload)) {
-      return this.reporter.report(payload);
+
+      const dailyLimit = (config)?config.getDailyLimit(payload):Number.MAX_VALUE;
+      let count = 0;
+      if (dailyLimit < Number.MAX_VALUE) {
+        //find currently stored count
+        count = await this.eventTracker.getEventCount(payload);
+        if (count >= dailyLimit){
+          //daily limit reached, do not send event
+          Logger.log(`Daily limit reached for ${event.name}: ${dailyLimit}`);
+          return;
+        }
+      }
+      return this.reporter.report(payload).then(()=>{
+        if (dailyLimit < Number.MAX_VALUE) {
+          //update count
+          Logger.log(`Storing event count (${count+1}/${dailyLimit}) for ${event.name}`);
+          return this.eventTracker.storeEventCount(payload, count+1);
+        }
+      });
     }
   }
 
@@ -86,7 +110,6 @@ export class TelemetryServiceImpl implements TelemetryService {
     this.queue?.emptyQueue();
     return this.reporter.closeAndFlush();
   }
-
 
   private getCurrentTimeInSeconds(): number {
     const now = Date.now();

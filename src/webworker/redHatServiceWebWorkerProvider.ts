@@ -19,6 +19,7 @@ export class RedHatServiceWebWorkerProvider extends AbstractRedHatServiceProvide
     const reporter = new Reporter(this.getSegmentApi(packageJson), new EventCacheService(storageService));
     const idManager = new VFSSystemIdProvider(storageService);
     const builder = new TelemetryServiceBuilder(packageJson)
+      .setContext(this.context)
       .setSettings(this.settings)
       .setIdProvider(idManager)
       .setReporter(reporter)
