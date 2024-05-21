@@ -42,7 +42,11 @@ Starting with 0.6.1, you can configure ratios on included events, meaning X% of 
         "refresh": "12h",
         "includes": [
             {
-                "name" : "*"
+                "name" : "startup",
+                "dailyLimit": "1" // Limit to 1 event per day per extension
+            },
+            {
+                "name" : "*" // Always put wildcard patterns last in the array, to ensure other events are included
             }
         ]
     },

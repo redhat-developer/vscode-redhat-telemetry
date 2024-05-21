@@ -4,6 +4,10 @@
         "refresh": "12h",
         "includes": [
             {
+                "name" : "startup",
+                "dailyLimit": 1
+            },
+            {
                 "name" : "*"
             }
         ],
@@ -17,6 +21,15 @@
     "redhat.java": {
         "enabled": "all",
         "ratio": "0.5",
+        "includes": [
+            {
+                "name" : "startup",
+                "dailyLimit": 1000
+            }, 
+            {
+                "name" : "*"
+            }
+        ],
         "excludes": [
             {
                 "name": "textCompletion",

@@ -5,10 +5,9 @@ import { TelemetryService } from './api/telemetry';
 import { TelemetryServiceImpl } from './impl/telemetryServiceImpl';
 import { TelemetryEventQueue } from './impl/telemetryEventQueue';
 import { TelemetrySettings } from './api/settings';
-import { getSegmentKey } from './utils/keyLocator';
 import { getExtensionId } from './utils/extensions';
-import { CacheService } from './api/cacheService';
 import { ConfigurationManager } from './impl/configurationManager';
+import { ExtensionContext } from 'vscode';
 
 /**
  * `TelemetryService` builder
@@ -20,6 +19,7 @@ export class TelemetryServiceBuilder {
     private environment?: Environment;
     private configurationManager?: ConfigurationManager;
     private reporter?: IReporter;
+    private context?:ExtensionContext;
 
     constructor(packageJson?: any) {
         this.packageJson = packageJson;
@@ -55,6 +55,11 @@ export class TelemetryServiceBuilder {
         return this;
     }
 
+    public setContext(context: ExtensionContext): TelemetryServiceBuilder {
+        this.context = context;
+        return this;
+    }
+
     public async build(): Promise<TelemetryService> {
         this.validate();
         if (!this.environment) {
@@ -76,10 +81,13 @@ export class TelemetryServiceBuilder {
         const queue = this.settings!.isTelemetryConfigured()
             ? undefined
             : new TelemetryEventQueue();
-        return new TelemetryServiceImpl(this.reporter!, queue, this.settings!, this.idProvider!, this.environment!, this.configurationManager);
+        return new TelemetryServiceImpl(this.context?.globalState!, this.reporter!, queue, this.settings!, this.idProvider!, this.environment!, this.configurationManager);
     }
 
     private validate() {
+        if (!this.context) {
+            throw new Error('context is not set');
+        }
         if (!this.idProvider) {
             throw new Error('idProvider is not set');
         }
