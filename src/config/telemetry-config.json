@@ -39,15 +39,15 @@
     },
     "redhat.fabric8-analytics": {
         "enabled": "all",
-        "ratio": "0.5"
+        "ratio": "0.0"
     },
     "redhat.vscode-yaml": {
         "enabled": "all",
-        "ratio": "0.5"
+        "ratio": "0.0"
     },
     "redhat.vscode-xml": {
         "enabled": "all",
-        "ratio": "0.5",
+        "ratio": "0.0",
         "excludes": [
             {
                 "name": "server.document.open",
