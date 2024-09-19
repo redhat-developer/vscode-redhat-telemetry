@@ -40,7 +40,7 @@
     "@types/vscode": "1.75.1",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "@typescript-eslint/parser": "^4.14.1",
-    "chai": "^4.3.6",
+    "chai": "^5.1.1",
     "copyfiles": "^2.4.1",
     "eslint": "^7.19.0",
     "mocha": "10.1.0",
