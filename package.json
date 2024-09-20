@@ -61,7 +61,7 @@
     "object-hash": "^3.0.0",
     "os-locale": "^5.0.0",
     "picomatch": "^4.0.2",
-    "ua-parser-js": "1.0.33",
+    "ua-parser-js": "1.0.39",
     "uuid": "^10.0.0"
   }
 }
