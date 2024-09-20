@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import * as mock from 'mock-fs';
+import * as fs from 'fs';
 import { GitpodIdProvider }  from '../../node/cloud/gitpodIdProvider'
 import env from '../../common/envVar';
 import { FileSystemIdProvider } from '../../node/fileSystemIdManager';
@@ -8,14 +8,14 @@ const redhatDir = `${process.cwd()}/.redhat/`;
 
 suite('Test gitpod Id manager', () => {
   setup(() => {  
-      mock({
-        '.redhat': {
-          'anonymousId': 'some-uuid'
-        }
-      });
+      if (fs.existsSync(redhatDir)) {
+        fs.rmSync(redhatDir, { recursive: true, force: true });
+      }
     });
     teardown(() => {
-        mock.restore();
+      if (fs.existsSync(redhatDir)) {
+        fs.rmSync(redhatDir, { recursive: true, force: true });
+      }
     });
     test('Should generate Red Hat UUID from GITPOD_GIT_USER_EMAIL env', async () => {
       env.GITPOD_GIT_USER_EMAIL = 'some.user@company.com';
