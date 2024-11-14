@@ -28,7 +28,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/chai": "^5.0.0",
-    "@types/countries-and-timezones": "3.2.3",
+    "@types/countries-and-timezones": "3.2.6",
     "@types/getos": "^3.0.1",
     "@types/mocha": "^10.0.0",
     "@types/mock-fs": "^4.13.1",
