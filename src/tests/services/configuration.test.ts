@@ -64,6 +64,10 @@ suite('Test configurations', () => {
         ]
     };
 
+    const fullyRatioedEvent = {
+        "ratio": "0"
+    }
+
     test('Should allow all events****', async () => {
         const config = new Configuration(all);
         let event = { event: "something", userId: "abcd"} as AnalyticsEvent;
@@ -226,5 +230,14 @@ suite('Test configurations', () => {
             event: "verbose-event",
         } as AnalyticsEvent;
         assert.ok(config.canSend(event) === false, `${event.event} should not be sent`);
+    });
+
+    test('Should exclude 100.0% of events', async () => {
+        const config = new Configuration(fullyRatioedEvent);
+        let event = {
+            userId: "f2cec861-8a0e-46cf-b385-08c7676e6e7e", // works out to a hash of ###0000, which means a ratio of 0
+            event: "not-wanted-event"
+            } as AnalyticsEvent;
+        assert.ok(config.canSend(event) === false, `${event.event} shouldn't be sent`);
     });
 });

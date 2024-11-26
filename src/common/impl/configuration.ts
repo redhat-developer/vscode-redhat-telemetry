@@ -36,14 +36,13 @@ export class Configuration {
             return false;
         }
 
-
         const currUserRatioValue = numValue(event.userId);
         const configuredRatio = getRatio(this.json?.ratio);
-        if (configuredRatio < currUserRatioValue) {
+        if (configuredRatio === 0 || configuredRatio < currUserRatioValue) {
             return false;
         }
 
-        const isIncluded = this.isIncluded(event, currUserRatioValue) 
+        const isIncluded = this.isIncluded(event, currUserRatioValue)
                         && !this.isExcluded(event, currUserRatioValue)
         return isIncluded;
     }
@@ -93,7 +92,7 @@ export class Configuration {
         }
         return [];
     }
-    
+
     isEventMatching(event: AnalyticsEvent, patterns:EventPattern[], currUserRatioValue: number, including: boolean):boolean {
         if (!patterns || !patterns.length) {
             return false;
@@ -114,7 +113,7 @@ export class Configuration {
                     const configuredEventRatio = getRatio(evtPtn?.ratio);
                     if (including) {
                         return currUserRatioValue <= configuredEventRatio;
-                    } 
+                    }
                     // excluding 90% of user means keeping 10%
                     // so user ratio value of 0.11 should be excluded (i.e match) when excluded event ratio = 0.9
                     return currUserRatioValue > 1 - configuredEventRatio;
