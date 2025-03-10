@@ -36,7 +36,7 @@ Red Hat extensions' specific telemetry collection details can be found there:
 * [Red Hat OpenShift Application Services](https://github.com/redhat-developer/vscode-rhoas/blob/main/USAGE_DATA.md)
 * [Remote Server Protocol](https://github.com/redhat-developer/vscode-rsp-ui/blob/master/USAGE_DATA.md)
 * [Tekton Pipelines](https://github.com/redhat-developer/vscode-tekton/blob/master/USAGE_DATA.md)
-* [Tooling for Apache Camel K](https://github.com/camel-tooling/vscode-camelk/blob/main/USAGE_DATA.md)
+* [Kaoto](https://github.com/kaotoio/vscode-kaoto/blob/main/USAGE_DATA.md)
 * [Language Support for Apache Camel](https://github.com/camel-tooling/camel-lsp-client-vscode/blob/main/USAGE_DATA.md)
 * [Debug Adapter for Apache Camel](https://github.com/camel-tooling/camel-dap-client-vscode/blob/main/USAGE_DATA.md)
 * [Tools for MicroProfile](https://github.com/redhat-developer/vscode-microprofile/blob/master/USAGE_DATA.md)
