@@ -55,7 +55,7 @@
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
-    "@segment/analytics-node": "2.2.0",
+    "@segment/analytics-node": "2.2.1",
     "countries-and-timezones": "^3.4.1",
     "getos": "^3.2.1",
     "object-hash": "^3.0.0",
