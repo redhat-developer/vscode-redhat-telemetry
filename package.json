@@ -34,7 +34,7 @@
     "@types/mock-fs": "^4.13.1",
     "@types/node": "^20.14.8",
     "@types/object-hash": "^3.0.2",
-    "@types/picomatch": "^3.0.1",
+    "@types/picomatch": "^4.0.0",
     "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^10.0.0",
     "@types/vscode": "1.75.1",
