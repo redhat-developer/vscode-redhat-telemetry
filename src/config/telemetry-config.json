@@ -39,7 +39,7 @@
     },
     "redhat.fabric8-analytics": {
         "enabled": "all",
-        "ratio": "0.0"
+        "ratio": "0.5"
     },
     "redhat.vscode-yaml": {
         "enabled": "all",
