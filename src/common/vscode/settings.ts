@@ -2,6 +2,8 @@ import { env, workspace, WorkspaceConfiguration } from 'vscode';
 import { TelemetrySettings } from '../api/settings';
 import { CONFIG_KEY } from '../impl/constants';
 
+const PRIVACY_FOCUSED_CLIENTS = [/codium/i];
+
 export class VSCodeSettings implements TelemetrySettings {
   isTelemetryEnabled(): boolean {
     return this.getTelemetryLevel() !== 'off' && getTelemetryConfiguration().get<boolean>('enabled', false);
@@ -14,7 +16,9 @@ export class VSCodeSettings implements TelemetrySettings {
     ) {
       return "off";
     }
-    return workspace.getConfiguration().get("telemetry.telemetryLevel", "off");
+    // telemetry is on by default in VS Code and most clones, except for VS Codium (maybe others?)
+    const defaultLevel = PRIVACY_FOCUSED_CLIENTS.some(client => client.test(env.appName ?? "")) ? "off" : "all";
+    return workspace.getConfiguration().get("telemetry.telemetryLevel", defaultLevel);
   }
 
   isTelemetryConfigured(): boolean {
@@ -48,7 +52,7 @@ export function didUserDisableTelemetry(): boolean {
     return false;
   }
   //Telemetry is not enabled, but it might not be the user's choice.
-  //i.e. could be the App's default setting (VS Codium), or  
-  //then the user only asked for reporting errors/crashes, in which case we can do the same. 
+  //i.e. could be the App's default setting (VS Codium), or
+  //then the user only asked for reporting errors/crashes, in which case we can do the same.
   return isPreferenceOverridden("telemetry.telemetryLevel") && workspace.getConfiguration().get("telemetry.telemetryLevel") === "off";
 }
