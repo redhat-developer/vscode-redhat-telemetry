@@ -16,7 +16,7 @@ From File > Preferences > Settings (On macOS: Code > Preferences > Settings), se
 
 
 ## How to disable telemetry reporting?
-If you want to stop sending usage data to Red Hat, you can set the `redhat.telemetry.enabled` user setting to `false`. 
+If you want to stop sending usage data to Red Hat, you can set the `redhat.telemetry.enabled` user setting to `false`.
 
 From File > Preferences > Settings (On macOS: Code > Preferences > Settings), search for telemetry, and uncheck the `Redhat > Telemetry : Enabled` setting. This will silence all telemetry events from Red Hat extensions going forward.
 
@@ -51,7 +51,7 @@ Starting with 0.6.1, you can configure ratios on included events, meaning X% of 
         ]
     },
     "redhat.vscode-hypothetical": {
-        "enabled": "error", 
+        "enabled": "error",
         "ratio": "0.5", // 50% of the users will send data
         "excludes": [
             {
@@ -61,7 +61,7 @@ Starting with 0.6.1, you can configure ratios on included events, meaning X% of 
         ]
     },
     "redhat.vscode-mythological": {
-        "enabled": "all", 
+        "enabled": "all",
         "includes": [
             {
                 "name": "something-too-frequent",
@@ -132,7 +132,7 @@ import { getRedHatService, TelemetryService } from "@redhat-developer/vscode-red
 let telemetryService: TelemetryService = null;
 
 export async function activate(context: ExtensionContext) {
-  const redhatService = await getRedHatService(context);  
+  const redhatService = await getRedHatService(context);
   telemetryService = await redhatService.getTelemetryService();
   telemetryService.sendStartupEvent();
   ...
@@ -150,7 +150,7 @@ if (telemetryService) {
     name: "Test Event",
     type: "track", // optional type (track is the default)
     properties: { // optional custom properties
-      foo: "bar", 
+      foo: "bar",
     }
   };
   telemetryService.send(event);
@@ -179,7 +179,7 @@ Once telemetry is in place, you need to document the extent of the telemetry col
 ### Checking telemetry during development
 In your `.vscode/launch.json`:
 - set the `VSCODE_REDHAT_TELEMETRY_DEBUG` environment variable to `true`, to log telemetry events in the console
-- set the `REDHAT_TELEMETRY_REMOTE_CONFIG_URL` environment variable to the URL of a remote configuration file, if you need to test remote configuration 
+- set the `REDHAT_TELEMETRY_REMOTE_CONFIG_URL` environment variable to the URL of a remote configuration file, if you need to test remote configuration
 
 ```json
 {
@@ -202,7 +202,7 @@ In your `.vscode/launch.json`:
 
 
 # How to use from a VS Code web extension
-When the VS Code extension runs as a web extension, telemetry should use a webworker specific API. So just change your code so it imports from the dedicated webworker namespace. 
+When the VS Code extension runs as a web extension, telemetry should use a webworker specific API. So just change your code so it imports from the dedicated webworker namespace.
 
 ```typescript
 import { getRedHatService, TelemetryService} from "@redhat-developer/vscode-redhat-telemetry/lib/webworker";
@@ -234,15 +234,8 @@ const webConfig = {
 ```
 
 # Build
-In a terminal, execute: 
-```
-npm i
-```
-to install the dependencies, then:
-```
-npm run prepublish
-```
-to build the library
+
+For build instructions and development setup, see our [Contributing Guide](CONTRIBUTING.md#building-the-project).
 
 # Information on data transmission during development
 
