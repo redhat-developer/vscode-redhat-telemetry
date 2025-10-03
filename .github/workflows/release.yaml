@@ -15,10 +15,14 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
+    permissions:
+      contents: write  # Required for creating releases
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for changelog generation
 
       # Set up Node
     - name: Use Node 20
@@ -36,6 +40,41 @@ jobs:
 
     - name: Test
       run: npm test
+
+    - name: Get previous tag
+      id: get_previous_tag
+      run: |
+        # Get the previous tag (excluding the current one)
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+        echo "tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+        echo "Previous tag: $PREVIOUS_TAG"
+
+      # Generate changelog for the release
+    - name: Build Changelog
+      id: build_changelog
+      uses: mikepenz/release-changelog-builder-action@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        configuration: ".github/changelog-config.json"
+        fromTag: ${{ steps.get_previous_tag.outputs.tag }}
+        toTag: ${{ github.ref_name }}
+        ignorePreReleases: true
+
+      # Create GitHub Release
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        body: |
+          ## What's Changed
+          ${{ steps.build_changelog.outputs.changelog }}
+
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.get_previous_tag.outputs.tag }}...${{ github.ref_name }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Publish to npm
     - name: Publish to npm
