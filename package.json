@@ -12,7 +12,13 @@
     "prepublish": "npm run build",
     "coverage": "nyc -r lcov -e .ts -x \"*.ts\" npm run test",
     "test": "mocha -r ts-node/register  --ui tdd \"src/tests/**/*.test.ts\"",
-    "package": "npm run build && webpack"
+    "package": "npm run build && webpack",
+    "prepare": "husky"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   },
   "files": [
     "/lib"
@@ -27,6 +33,8 @@
   "author": "Red Hat",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
     "@types/chai": "^5.0.0",
     "@types/countries-and-timezones": "3.2.6",
     "@types/getos": "^3.0.1",
@@ -43,6 +51,7 @@
     "chai": "^5.1.1",
     "copyfiles": "^2.4.1",
     "eslint": "^9.10.0",
+    "husky": "^9.1.7",
     "mocha": "11.1.0",
     "mock-fs": "^5.1.4",
     "nyc": "^17.1.0",
