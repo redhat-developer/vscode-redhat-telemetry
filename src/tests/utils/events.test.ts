@@ -5,14 +5,14 @@ import { TelemetryEvent } from '../../common/api/telemetry';
 
 const env: Environment = {
     application: {
-        name:'SuperCode',
-        version:'6.6.6'
+        name: 'SuperCode',
+        version: '6.6.6'
     },
     extension: {
         name: 'my-ext',
         version: '1.2.3'
     },
-    username:'Fred',
+    username: 'Fred',
     platform: {
         name: 'DeathStar II'
     },
@@ -23,9 +23,9 @@ const USER_ID = "1234";
 suite('Test events enhancements', () => {
     test('should inject environment data', async () => {
         const event: TelemetryEvent = {
-            name:'Something',
+            name: 'Something',
             properties: {
-                foo: 'bar',
+                foo: 'http://bar',
             }
         }
 
@@ -34,19 +34,19 @@ suite('Test events enhancements', () => {
         assert.strictEqual(betterEvent.properties.app_version, '6.6.6');
         assert.strictEqual(betterEvent.properties.extension_name, 'my-ext');
         assert.strictEqual(betterEvent.properties.extension_version, '1.2.3');
-        assert.strictEqual(betterEvent.properties.foo, 'bar');
+        assert.strictEqual(betterEvent.properties.foo, 'http://bar');
         assert.strictEqual(betterEvent.context.ip, '0.0.0.0');
 
     });
 
     test('should anonymize data', async () => {
         const event: TelemetryEvent = {
-            name:'Something',
+            name: 'Something',
             properties: {
                 foo: 'Fred is Fred',
                 qty: 10,
                 active: false,
-                bar: 'That c:\\Fred\\bar looks like a path',
+                bar: 'That c:\\Fred\\bar looks like a path, but is not fully anonymized',
                 error: 'An error occurred in /Users/Fred/foo/bar.txt! But we\'re fine',
                 multiline: 'That url file://Fred/bar.txt is gone!\nNot that c:\\user\\bar though',
                 obj: {
@@ -61,19 +61,47 @@ suite('Test events enhancements', () => {
         assert.strictEqual(betterEvent.properties.qty, 10);
         assert.strictEqual(betterEvent.properties.active, false);
         assert.strictEqual(betterEvent.properties.foo, '_username_ is _username_');
-        assert.strictEqual(betterEvent.properties.bar, 'That c:\\_username_\\bar looks like a path');
-        assert.strictEqual(betterEvent.properties.error, 'An error occurred in /Users/_username_/foo/bar.txt! But we\'re fine');
+        assert.strictEqual(betterEvent.properties.bar, 'That c:\\_username_\\bar looks like a path, but is not fully anonymized');
+        assert.strictEqual(betterEvent.properties.error, 'An error occurred in <REDACTED: user-file-path>! But we\'re fine');
         assert.strictEqual(betterEvent.properties.multiline, 'That url file://_username_/bar.txt is gone!\nNot that c:\\user\\bar though');
         assert.strictEqual(betterEvent.properties.obj.q, 'Who is _username_?');
         assert.strictEqual(betterEvent.properties.obj.a, '_username_ who?');
+    });
+
+    test('should anonymize stacktraces', async () => {
+        const stacktrace = `
+        An internal error occurred during: "Updating workspace".
+        Tree element '/myprojectname/target/classes' not found.
+        org.eclipse.core.internal.dtree.ObjectNotFoundException: Tree element '/myprojectname/target/classes' not found.
+        at org.eclipse.core.internal.dtree.AbstractDataTree.handleNotFound(AbstractDataTree.java:183)
+        at org.eclipse.core.internal.dtree.DeltaDataTree.getData(DeltaDataTree.java:572)
+        at org.eclipse.core.internal.dtree.DeltaDataTree.naiveCopyCompleteSubtree(DeltaDataTree.java:757)`;
+
+        const expectedStacktrace = `
+        An internal error occurred during: "Updating workspace".
+        Tree element '<REDACTED: user-file-path>' not found.
+        org.eclipse.core.internal.dtree.ObjectNotFoundException: Tree element '<REDACTED: user-file-path>' not found.
+        at org.eclipse.core.internal.dtree.AbstractDataTree.handleNotFound(AbstractDataTree.java:183)
+        at org.eclipse.core.internal.dtree.DeltaDataTree.getData(DeltaDataTree.java:572)
+        at org.eclipse.core.internal.dtree.DeltaDataTree.naiveCopyCompleteSubtree(DeltaDataTree.java:757)`;
+
+        const event: TelemetryEvent = {
+            name: 'Something',
+            properties: {
+                stacktrace: stacktrace
+            }
+        }
+
+        const betterEvent = utils.transform(event, USER_ID, env);
+        assert.strictEqual(betterEvent.properties.stacktrace, expectedStacktrace);
     });
 
     test('should not anonymize special usernames', async () => {
         utils.IGNORED_USERS.forEach((user) => {
             const cheEnv: Environment = {
                 application: {
-                    name:'SuperCode',
-                    version:'6.6.6'
+                    name: 'SuperCode',
+                    version: '6.6.6'
                 },
                 extension: {
                     name: 'my-ext',
@@ -86,7 +114,7 @@ suite('Test events enhancements', () => {
             }
 
             const event: TelemetryEvent = {
-                name:'Something',
+                name: 'Something',
                 properties: {
                     foo: 'vscode likes theia',
                     multiline: 'That gitpod \nusername is a redhat user',
@@ -102,8 +130,8 @@ suite('Test events enhancements', () => {
     test('should not anonymize technical properties', async () => {
         const someEnv: Environment = {
             application: {
-                name:'codename',
-                version:'codename'
+                name: 'codename',
+                version: 'codename'
             },
             extension: {
                 name: 'codename',
@@ -116,7 +144,7 @@ suite('Test events enhancements', () => {
         }
 
         const event: TelemetryEvent = {
-            name:'Something',
+            name: 'Something',
             properties: {
                 foo: 'codename likes vscode',
                 multiline: 'That gitpod \ncodename is a redhat user',
