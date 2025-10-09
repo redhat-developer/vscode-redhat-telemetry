@@ -1,6 +1,7 @@
 import { AnalyticsEvent } from '../api/analyticsEvent';
 import { Environment } from '../api/environment';
 import { TelemetryEvent } from '../api/telemetry';
+import { anonymizeFilePaths } from './telemetryUtils';
 
 /**
  * Enhances a `TelemetryEvent` by injecting environmental data to its properties and context
@@ -95,6 +96,7 @@ import { TelemetryEvent } from '../api/telemetry';
  */
 export const IGNORED_USERS = ['user', 'gitpod', 'theia', 'vscode', 'redhat']
 export const IGNORED_PROPERTIES = ['extension_name', 'extension_version', 'app_name', 'app_version', 'app_kind', 'app_remote', 'app_host', 'browser_name', 'browser_version', '']
+export const REDACTED_PATH_PROPERTIES = [/error/, /message/, /stacktrace/, /exception/]
 
 export function transform(event: TelemetryEvent, userId: string, environment: Environment): AnalyticsEvent {
   //Inject Client name and version,  Extension id and version, and timezone to the event properties
@@ -177,9 +179,14 @@ function sanitize(properties: any, environment: Environment): any {
       continue;
     }
     const isObj = isObject(rawProperty);
+
     let sanitizedProperty = isObj ? JSON.stringify(rawProperty) : rawProperty;
 
-    sanitizedProperty = (sanitizedProperty as string).replace(usernameRegexp, '_username_');
+    if (REDACTED_PATH_PROPERTIES.some(rpp => rpp.test(p))) {
+      sanitizedProperty = anonymizeFilePaths(sanitizedProperty as string);
+    }
+
+    sanitizedProperty = sanitizedProperty.replace(usernameRegexp, '_username_');
     if (isObj) {
       //let's try to deserialize into a sanitized object
       try {
