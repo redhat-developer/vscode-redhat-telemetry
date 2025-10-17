@@ -166,6 +166,18 @@ suite('Test anonymizeFilePaths', () => {
         assert.strictEqual(result, input);
     });
 
+    test('should preserve JDT Language Server Java project paths with default patterns', () => {
+        const input = 'Error at /jdt.ls-java-project/src/main/java/com/example/MyClass.java:45';
+        const result = anonymizeFilePaths(input);
+        assert.strictEqual(result, input);
+    });
+
+    test('should anonymize file:/ URLs even with JDT workspace paths', () => {
+        const input = 'Failed to read package name from file:/Users/someguy/Library/Application%20Support/Code/User/workspaceStorage/4f4553a7f3f79b5e8qa7c889b39fe96b/redhat.java/jdt_ws/Hello.java/';
+        const result = anonymizeFilePaths(input);
+        assert.strictEqual(result, 'Failed to read package name from <REDACTED: user-file-path>/');
+    });
+
     test('should anonymize user paths but preserve Java paths with default patterns', () => {
         const input = 'Error at /Users/john/project/src/main.ts:45 and java.base/java.lang.String.<init>(String.java:123)';
         const result = anonymizeFilePaths(input);
