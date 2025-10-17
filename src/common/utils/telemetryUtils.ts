@@ -6,11 +6,12 @@
 
 // Regex patterns for path sanitization
 const NODE_MODULES_REGEX = /[\\\/]?(node_modules|node_modules\.asar)[\\\/]/;
-const FILE_REGEX_PATTERN = /(file:\/\/)?([a-zA-Z]:(\\\\|\\|\/)|(\\\\|\\|\/))?([\w-\._]+(\\\\|\\|\/))+[\w-\._]+/g;
+const FILE_REGEX_PATTERN = /(file:\/\/?)?([a-zA-Z]:(\\\\|\\|\/)|(\\\\|\\|\/))?([\w-\._%]+(\\\\|\\|\/))+[\w-\._%]+/g;
 
 // Default cleanup patterns to preserve common system/library paths
 const DEFAULT_CLEANUP_PATTERNS: RegExp[] = [
     /java\.\S*/,          // Java standard library and related packages (any non-whitespace chars)
+    /\/jdt\.ls-java-project\S*/, // Eclipse JDT Language Server Java project paths
 ];
 
 /**
