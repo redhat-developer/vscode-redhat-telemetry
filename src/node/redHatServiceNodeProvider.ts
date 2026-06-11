@@ -8,6 +8,7 @@ import { AbstractRedHatServiceProvider } from '../common/vscode/redhatServiceIni
 import { IdManagerFactory } from './idManagerFactory';
 import { getEnvironment } from './platform';
 import { EventCacheService } from '../common/impl/eventCacheService'
+import { getSegmentKey } from '../common/utils/keyLocator';
 
 export class RedHatServiceNodeProvider extends AbstractRedHatServiceProvider {
 
@@ -16,7 +17,7 @@ export class RedHatServiceNodeProvider extends AbstractRedHatServiceProvider {
     const extensionId = extensionInfo.id;
     const packageJson = getPackageJson(extensionInfo);
     const storageService = new FileSystemStorageService(this.getCachePath());
-    const reporter = new Reporter(this.getSegmentApi(packageJson), new EventCacheService(storageService));
+    const reporter = new Reporter(this.getSegmentApi(packageJson), new EventCacheService(storageService), getSegmentKey(packageJson));
     const idManager = IdManagerFactory.getIdManager();
     const builder = new TelemetryServiceBuilder(packageJson)
       .setContext(this.context)
