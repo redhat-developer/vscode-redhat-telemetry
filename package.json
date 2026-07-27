@@ -5,8 +5,8 @@
   "main": "lib/index.js",
   "types": "lib",
   "scripts": {
-    "clean": "rimraf lib/",
-    "copy-files": "cpy \"src/config/*\" lib/config/ && cpy \"src/tests/config/*\" lib/tests/config/",
+    "clean": "node -e \"fs.rmSync('lib',{recursive:true,force:true})\"",
+    "copy-files": "node -e \"fs.cpSync('src/config','lib/config',{recursive:true});fs.cpSync('src/tests/config','lib/tests/config',{recursive:true})\"",
     "compile": "esbuild src/index.ts 'src/common/**/*.ts' 'src/node/**/*.ts' 'src/webworker/*.ts' --outdir=lib --outbase=src --format=cjs --sourcemap --platform=node && tsc -b --emitDeclarationOnly",
     "typecheck": "tsc -b --noEmit",
     "build": "npm run clean && npm run copy-files && npm run compile",
@@ -49,9 +49,7 @@
     "@types/uuid": "^10.0.0",
     "@types/vscode": "1.75.1",
     "@vitest/coverage-v8": "^4.1.10",
-    "cpy-cli": "^7.0.0",
     "husky": "^9.1.7",
-    "rimraf": "^6.0.1",
     "typescript": "^5.6.2",
     "vitest": "^4.1.10",
     "esbuild": "^0.25.0"
