@@ -1,6 +1,6 @@
-import { getExtensionId } from "./extensions";
-import { Logger } from "./logger";
 import debug from './debug';
+import { getExtensionId } from './extensions';
+import { Logger } from './logger';
 
 let DEFAULT_SEGMENT_KEY: string | undefined;
 
@@ -21,7 +21,7 @@ function readSegmentKey(packageJson: any): string | undefined {
   const extensionId = getExtensionId(packageJson);
   let keyKey = 'segmentWriteKeyDebug';
   try {
-    let clientSegmentKey: string | undefined = undefined;
+    let clientSegmentKey: string | undefined;
     if (debug) {
       clientSegmentKey = packageJson[keyKey];
     } else {

@@ -1,12 +1,12 @@
-import envVars from "../envVar";
+import envVars from '../envVar';
 
-export let doLog: boolean = envVars.VSCODE_REDHAT_TELEMETRY_DEBUG === 'true';
+export const doLog: boolean = envVars.VSCODE_REDHAT_TELEMETRY_DEBUG === 'true';
 
 // This exists only for testing purposes. Could delete later.
 const VERSION = require('../../../package.json').version;
 
-
 export namespace Logger {
+  // biome-ignore lint/style/useConst: reassigned from redhatServiceInitializer.ts
   export let extId = 'unknown';
   export function log(s: number | string | boolean | undefined): void {
     if (doLog) {

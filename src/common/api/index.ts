@@ -1,4 +1,4 @@
-import { TelemetryService } from './telemetry';
 import { RedHatService } from './redhatService';
+import { TelemetryService } from './telemetry';
 
-export { TelemetryService, RedHatService }
+export { RedHatService, TelemetryService };

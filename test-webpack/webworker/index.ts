@@ -1,6 +1,3 @@
-import {
-  getRedHatService,
-  TelemetryService,
-} from "../../lib/webworker";
+import { getRedHatService } from '../../lib/webworker';
 
-console.log("Hello World");
+console.log('Hello World', getRedHatService);

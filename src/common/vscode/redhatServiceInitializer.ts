@@ -1,25 +1,32 @@
 import Analytics from '@segment/analytics-node';
-import { ConfigurationChangeEvent, Disposable, env, ExtensionContext, workspace, window, Uri } from "vscode";
-import { RedHatService } from "../api/redhatService";
-import { TelemetryService } from "../api/telemetry";
-import { Logger } from "../utils/logger";
-import { ExtensionInfo, getExtension } from '../utils/extensions'
-import { didUserDisableTelemetry, VSCodeSettings } from '../vscode/settings';
-import { deleteFile, exists, mkdir, readFile, writeFile } from '../vscode/fsUtils'
+import {
+  type ConfigurationChangeEvent,
+  type Disposable,
+  type ExtensionContext,
+  env,
+  Uri,
+  window,
+  workspace,
+} from 'vscode';
+import type { RedHatService } from '../api/redhatService';
+import type { TelemetryService } from '../api/telemetry';
 import { OPT_OUT_INSTRUCTIONS_URL, PRIVACY_STATEMENT_URL } from '../impl/constants';
+import { type ExtensionInfo, getExtension } from '../utils/extensions';
 import { getSegmentKey } from '../utils/keyLocator';
+import { Logger } from '../utils/logger';
+import { deleteFile, exists, readFile, writeFile } from '../vscode/fsUtils';
+import { didUserDisableTelemetry, VSCodeSettings } from '../vscode/settings';
 
 const RETRY_OPTIN_DELAY_IN_MS = 24 * 60 * 60 * 1000; // 24h
 
 export abstract class AbstractRedHatServiceProvider {
-  
   settings: VSCodeSettings;
   extensionInfo?: ExtensionInfo;
   extensionId?: string;
   context: ExtensionContext;
   constructor(context: ExtensionContext) {
     this.settings = new VSCodeSettings();
-    this.context= context;
+    this.context = context;
   }
 
   public abstract buildRedHatService(): Promise<RedHatService>;
@@ -29,11 +36,11 @@ export abstract class AbstractRedHatServiceProvider {
     const maxEventsInBatch = 1;
     const flushInterval = 1000;
     const httpRequestTimeout = 3000;
-    return new Analytics({writeKey, maxEventsInBatch, flushInterval, httpRequestTimeout});
+    return new Analytics({ writeKey, maxEventsInBatch, flushInterval, httpRequestTimeout });
   }
 
   public getCachePath(): Uri {
-   return Uri.joinPath(this.getTelemetryWorkingDir(this.context), 'cache');
+    return Uri.joinPath(this.getTelemetryWorkingDir(this.context), 'cache');
   }
 
   /**
@@ -41,7 +48,7 @@ export abstract class AbstractRedHatServiceProvider {
    * - A preference listener enables/disables  telemetry based on changes to `redhat.telemetry.enabled`
    * - If `redhat.telemetry.enabled` is not set, a popup requesting telemetry opt-in will be displayed
    * - when the extension is deactivated, a telemetry shutdown event will be emitted (if telemetry is enabled)
-   *  
+   *
    * @param context the extension's context
    * @returns a Promise of RedHatService
    */
@@ -55,7 +62,7 @@ export abstract class AbstractRedHatServiceProvider {
     // register disposable to send shutdown event
     this.context.subscriptions.push(shutdownHook(telemetryService));
 
-    // register preference listener for that extension, 
+    // register preference listener for that extension,
     // so it stops/starts sending data when redhat.telemetry.enabled changes
     this.context.subscriptions.push(onDidChangeTelemetryEnabled(telemetryService));
 
@@ -63,7 +70,7 @@ export abstract class AbstractRedHatServiceProvider {
 
     telemetryService.send({
       type: 'identify',
-      name: 'identify'
+      name: 'identify',
     });
 
     return redhatService;
@@ -77,9 +84,9 @@ export abstract class AbstractRedHatServiceProvider {
     if (this.settings.isTelemetryConfigured() || didUserDisableTelemetry()) {
       return;
     }
-  
+
     let popupInfo: PopupInfo | undefined;
-  
+
     const parentDir = this.getTelemetryWorkingDir(this.context);
     const optinPopupInfo = Uri.joinPath(parentDir, 'redhat.optin.json');
     if (await exists(optinPopupInfo)) {
@@ -95,18 +102,20 @@ export abstract class AbstractRedHatServiceProvider {
       popupInfo = {
         owner: this.extensionId!,
         sessionId: env.sessionId,
-        time: new Date().getTime() //for troubleshooting purposes
-      }
+        time: Date.now(), //for troubleshooting purposes
+      };
       await writeFile(optinPopupInfo, JSON.stringify(popupInfo));
       this.context.subscriptions.push({
-        dispose: () => { safeCleanup(optinPopupInfo); }
+        dispose: () => {
+          safeCleanup(optinPopupInfo);
+        },
       });
     }
-  
+
     const message: string = `Help Red Hat improve its extensions by allowing them to collect usage data. 
       Read our [privacy statement](${PRIVACY_STATEMENT_URL}?from=${this.extensionId!}) 
     and learn how to [opt out](${OPT_OUT_INSTRUCTIONS_URL}?from=${this.extensionId!}).`;
-  
+
     const retryOptin = setTimeout(this.openTelemetryOptInDialogIfNeeded, RETRY_OPTIN_DELAY_IN_MS);
     let selection: string | undefined;
     try {
@@ -130,15 +139,15 @@ function onDidChangeTelemetryEnabled(telemetryService: TelemetryService): Dispos
     //as soon as user changed the redhat.telemetry setting, we consider
     //opt-in (or out) has been set, so whichever the choice is, we flush the queue
     (e: ConfigurationChangeEvent) => {
-      if (e.affectsConfiguration("redhat.telemetry") || e.affectsConfiguration("telemetry")) {
+      if (e.affectsConfiguration('redhat.telemetry') || e.affectsConfiguration('telemetry')) {
         telemetryService.flushQueue();
       }
-    }
+    },
   );
 }
 
 interface PopupInfo {
-  owner: string,
+  owner: string;
   sessionId: string;
   time: number;
 }
@@ -146,7 +155,7 @@ interface PopupInfo {
 function safeCleanup(filePath: Uri) {
   try {
     deleteFile(filePath);
-  } catch (err : any) {
+  } catch (err: any) {
     Logger.log(err);
   }
   Logger.log(`Deleted ${filePath}`);
@@ -157,7 +166,7 @@ function shutdownHook(telemetryService: TelemetryService): Disposable {
     dispose: async () => {
       await telemetryService.sendShutdownEvent();
       await telemetryService.dispose();
-      Logger.log("disposed telemetry service");
-    }
+      Logger.log('disposed telemetry service');
+    },
   };
 }

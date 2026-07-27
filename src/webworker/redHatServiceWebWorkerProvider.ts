@@ -1,16 +1,15 @@
-import { RedHatService } from '../common/api/redhatService';
+import type { RedHatService } from '../common/api/redhatService';
 import { ConfigurationManager } from '../common/impl/configurationManager';
+import { EventCacheService } from '../common/impl/eventCacheService';
+import { Reporter } from '../common/impl/reporter';
 import { TelemetryServiceBuilder } from '../common/telemetryServiceBuilder';
 import { getExtension, getPackageJson } from '../common/utils/extensions';
 import { FileSystemStorageService } from '../common/vscode/fileSystemStorageService';
-import { AbstractRedHatServiceProvider} from '../common/vscode/redhatServiceInitializer';
+import { AbstractRedHatServiceProvider } from '../common/vscode/redhatServiceInitializer';
 import { getEnvironment } from './platform';
-import { Reporter } from '../common/impl/reporter'; 
 import { VFSSystemIdProvider } from './vfsIdManager';
-import { EventCacheService } from '../common/impl/eventCacheService';
 
 export class RedHatServiceWebWorkerProvider extends AbstractRedHatServiceProvider {
-
   public async buildRedHatService(): Promise<RedHatService> {
     const extensionInfo = await getExtension(this.context);
     const extensionId = extensionInfo.id;
@@ -29,8 +28,7 @@ export class RedHatServiceWebWorkerProvider extends AbstractRedHatServiceProvide
     const telemetryService = await builder.build();
     return {
       getTelemetryService: () => Promise.resolve(telemetryService),
-      getIdProvider: () => Promise.resolve(idManager)
-    }
+      getIdProvider: () => Promise.resolve(idManager),
+    };
   }
 }
-

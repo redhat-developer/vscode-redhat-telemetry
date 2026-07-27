@@ -1,9 +1,9 @@
-import { ExtensionContext } from "vscode";
-import { RedHatService } from "../common/api/redhatService"
-import { TelemetryService, TelemetryEvent} from "../common/api/telemetry";
-import { RedHatServiceWebWorkerProvider } from "./redHatServiceWebWorkerProvider";
+import type { ExtensionContext } from 'vscode';
+import type { RedHatService } from '../common/api/redhatService';
+import type { TelemetryEvent, TelemetryService } from '../common/api/telemetry';
+import { RedHatServiceWebWorkerProvider } from './redHatServiceWebWorkerProvider';
 
-export {RedHatService, TelemetryService, TelemetryEvent};
+export type { RedHatService, TelemetryEvent, TelemetryService };
 
 export function getRedHatService(extension: ExtensionContext): Promise<RedHatService> {
   const provider = new RedHatServiceWebWorkerProvider(extension);

@@ -1,14 +1,14 @@
+import type { Memento } from 'vscode';
+import type { Environment } from '../api/environment';
+import type { IdProvider } from '../api/idProvider';
+import type { IReporter } from '../api/reporter';
+import type { TelemetrySettings } from '../api/settings';
+import type { TelemetryEvent, TelemetryService } from '../api/telemetry';
+import type { TelemetryEventQueue } from '../impl/telemetryEventQueue';
+import { isError, transform } from '../utils/events';
 import { Logger } from '../utils/logger';
-import { TelemetrySettings } from '../api/settings';
-import { TelemetryEventQueue } from '../impl/telemetryEventQueue';
-import { TelemetryService, TelemetryEvent } from '../api/telemetry';
-import { ConfigurationManager } from './configurationManager';
-import { IdProvider } from '../api/idProvider';
-import { Environment } from '../api/environment';
-import { transform, isError } from '../utils/events';
-import { IReporter } from '../api/reporter';
+import type { ConfigurationManager } from './configurationManager';
 import { EventTracker } from './eventTracker';
-import { Memento } from 'vscode';
 
 /**
  * Implementation of a `TelemetryService`
@@ -17,14 +17,15 @@ export class TelemetryServiceImpl implements TelemetryService {
   private startTime: number;
   private eventTracker: EventTracker;
 
-  constructor(globalState: Memento,
-              private reporter: IReporter, 
-              private queue: TelemetryEventQueue | undefined, 
-              private settings: TelemetrySettings, 
-              private idManager: IdProvider, 
-              private environment: Environment,
-              private configurationManager?: ConfigurationManager
-            ) {
+  constructor(
+    globalState: Memento,
+    private reporter: IReporter,
+    private queue: TelemetryEventQueue | undefined,
+    private settings: TelemetrySettings,
+    private idManager: IdProvider,
+    private environment: Environment,
+    private configurationManager?: ConfigurationManager,
+  ) {
     this.startTime = this.getCurrentTimeInSeconds();
     this.eventTracker = new EventTracker(globalState);
   }
@@ -51,42 +52,44 @@ export class TelemetryServiceImpl implements TelemetryService {
     return this.send({ name: 'startup' });
   }
   public async sendShutdownEvent(): Promise<void> {
-    return this.send({ name: 'shutdown', properties: {
-      //Sends session duration in seconds
-      session_duration: this.getCurrentTimeInSeconds() - this.startTime
-    } });
+    return this.send({
+      name: 'shutdown',
+      properties: {
+        //Sends session duration in seconds
+        session_duration: this.getCurrentTimeInSeconds() - this.startTime,
+      },
+    });
   }
 
   private async sendEvent(event: TelemetryEvent): Promise<void> {
     //Check against VS Code settings
     const level = this.settings.getTelemetryLevel();
-    if (level && ["error","crash"].includes(level) && !isError(event)) {
+    if (level && ['error', 'crash'].includes(level) && !isError(event)) {
       return;
     }
 
-    const userId = await this.idManager.getRedHatUUID()
+    const userId = await this.idManager.getRedHatUUID();
     const payload = transform(event, userId, this.environment);
 
     //Check against Extension configuration
     const config = await this.configurationManager?.getExtensionConfiguration();
     if (!config || config.canSend(payload)) {
-
-      const dailyLimit = (config)?config.getDailyLimit(payload):Number.MAX_VALUE;
+      const dailyLimit = config ? config.getDailyLimit(payload) : Number.MAX_VALUE;
       let count = 0;
       if (dailyLimit < Number.MAX_VALUE) {
         //find currently stored count
         count = await this.eventTracker.getEventCount(payload);
-        if (count >= dailyLimit){
+        if (count >= dailyLimit) {
           //daily limit reached, do not send event
           Logger.log(`Daily limit reached for ${event.name}: ${dailyLimit}`);
           return;
         }
       }
-      return this.reporter.report(payload).then(()=>{
+      return this.reporter.report(payload).then(() => {
         if (dailyLimit < Number.MAX_VALUE) {
           //update count
-          Logger.log(`Storing event count (${count+1}/${dailyLimit}) for ${event.name}`);
-          return this.eventTracker.storeEventCount(payload, count+1);
+          Logger.log(`Storing event count (${count + 1}/${dailyLimit}) for ${event.name}`);
+          return this.eventTracker.storeEventCount(payload, count + 1);
         }
       });
     }
@@ -113,6 +116,6 @@ export class TelemetryServiceImpl implements TelemetryService {
 
   private getCurrentTimeInSeconds(): number {
     const now = Date.now();
-    return Math.floor(now/1000);
+    return Math.floor(now / 1000);
   }
 }
