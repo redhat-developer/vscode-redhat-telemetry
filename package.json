@@ -5,8 +5,8 @@
   "main": "lib/index.js",
   "types": "lib",
   "scripts": {
-    "clean": "node -e \"fs.rmSync('lib',{recursive:true,force:true})\"",
-    "copy-files": "node -e \"fs.cpSync('src/config','lib/config',{recursive:true});fs.cpSync('src/tests/config','lib/tests/config',{recursive:true})\"",
+    "clean": "node -e \"require('node:fs').rmSync('lib',{recursive:true,force:true})\"",
+    "copy-files": "node -e \"const fs=require('node:fs');fs.cpSync('src/config','lib/config',{recursive:true});fs.cpSync('src/tests/config','lib/tests/config',{recursive:true})\"",
     "compile": "esbuild src/index.ts 'src/common/**/*.ts' 'src/node/**/*.ts' 'src/webworker/*.ts' --outdir=lib --outbase=src --format=cjs --sourcemap --platform=node && tsc -b --emitDeclarationOnly",
     "typecheck": "tsc -b --noEmit",
     "build": "npm run clean && npm run copy-files && npm run compile",
@@ -16,7 +16,7 @@
     "format": "biome format --write .",
     "check": "biome check --write .",
     "lint": "biome check .",
-    "package": "npm run build && esbuild test-bundle/node/index.ts --bundle --platform=node --outfile=dist/node/foo.node.bundle.js --external:vscode",
+    "package": "npm run build && esbuild test-bundle/node/index.ts --bundle --platform=node --outfile=dist/node/foo.node.bundle.js --external:vscode && esbuild test-bundle/webworker/index.ts --bundle --platform=browser --outfile=dist/webworker/foo.webworker.bundle.js --external:vscode --external:node:*",
     "prepare": "husky"
   },
   "commitlint": {
