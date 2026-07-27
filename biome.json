@@ -30,6 +30,6 @@
     }
   },
   "files": {
-    "includes": ["src/**", "test-webpack/**", "*.config.*"]
+    "includes": ["src/**", "test-bundle/**", "*.config.*"]
   }
 }
