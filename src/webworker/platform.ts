@@ -3,9 +3,9 @@ import { env as vscodeEnv, UIKind, version} from 'vscode';
 
 import { getCountry } from '../common/utils/geolocation';
 import env from '../common/envVar';
-import UAParser from 'ua-parser-js';
+import { UAParser, IResult } from 'ua-parser-js';
 
-let userAgentInfo : UAParser.IResult;
+let userAgentInfo : IResult;
 
 function getUAInfo() {
     if (userAgentInfo) {
