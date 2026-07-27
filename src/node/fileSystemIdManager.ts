@@ -1,19 +1,18 @@
-import { IdProvider } from "../common/api/idProvider";
+import * as fs from 'node:fs';
 
-import * as os from 'os';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import type { IdProvider } from '../common/api/idProvider';
 import { Logger } from '../common/utils/logger';
-import { generateUUID } from "../common/utils/uuid";
+import { generateUUID } from '../common/utils/uuid';
 
 let REDHAT_ANONYMOUS_UUID: string | undefined;
 
 /**
-* Service providing the Red Hat anonymous user id, read/stored from the `~/.redhat/anonymousId` file. 
-*/
+ * Service providing the Red Hat anonymous user id, read/stored from the `~/.redhat/anonymousId` file.
+ */
 export class FileSystemIdProvider implements IdProvider {
-
-  constructor(private redhatDir?: string) { }
+  constructor(private redhatDir?: string) {}
 
   async getRedHatUUID(): Promise<string> {
     return this.loadRedHatUUID();
@@ -35,7 +34,7 @@ export class FileSystemIdProvider implements IdProvider {
         Logger.log(`Written Red Hat UUID: ${REDHAT_ANONYMOUS_UUID} to ${redhatUUIDFilePath}`);
       }
     } catch (e: any) {
-      Logger.log('Failed to access Red Hat UUID: ' + e?.message);
+      Logger.log(`Failed to access Red Hat UUID: ${e?.message}`);
     }
     return REDHAT_ANONYMOUS_UUID!;
   }
@@ -66,5 +65,4 @@ export class FileSystemIdProvider implements IdProvider {
     }
     fs.writeFileSync(filePath, content, { encoding: 'utf8' });
   }
-
 }

@@ -50,8 +50,8 @@ npm install
 
 This will install:
 - TypeScript and build tools
-- Testing frameworks (Mocha, Chai)
-- Linting tools (ESLint)
+- Testing framework (Vitest)
+- Formatting and linting tools (Biome)
 - Commit linting tools (commitlint, husky)
 - Webpack for bundling
 
@@ -102,6 +102,9 @@ npm run package
 - `npm run build` - Full build process (clean + copy + compile)
 - `npm run package` - Build and bundle with webpack
 - `npm run prepublish` - Build for publishing
+- `npm run format` - Format code with Biome
+- `npm run lint` - Check formatting and lint rules with Biome
+- `npm run check` - Check and auto-fix lint issues with Biome
 
 ## Testing
 
@@ -256,10 +259,12 @@ This will log telemetry events to the console instead of sending them to Red Hat
 
 ### Code Style
 
-The project uses ESLint for code formatting and style enforcement. Run the linter:
+The project uses [Biome](https://biomejs.dev/) for code formatting and linting. Formatting is checked automatically on commit via a pre-commit hook.
 
 ```bash
-npx eslint src/
+npm run lint      # Check formatting and lint rules
+npm run format    # Auto-format code
+npm run check     # Check and auto-fix lint issues
 ```
 
 ## Getting Help

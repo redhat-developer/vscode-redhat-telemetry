@@ -1,5 +1,5 @@
-import { env, workspace, WorkspaceConfiguration } from 'vscode';
-import { TelemetrySettings } from '../api/settings';
+import { env, type WorkspaceConfiguration, workspace } from 'vscode';
+import type { TelemetrySettings } from '../api/settings';
 import { CONFIG_KEY } from '../impl/constants';
 
 const PRIVACY_FOCUSED_CLIENTS = [/codium/i];
@@ -11,25 +11,25 @@ export class VSCodeSettings implements TelemetrySettings {
 
   getTelemetryLevel(): string {
     //Respecting old vscode telemetry settings https://github.com/microsoft/vscode/blob/f09c4124a229b4149984e1c2da46f35b873d23fa/src/vs/platform/telemetry/common/telemetryUtils.ts#L131
-    if (workspace.getConfiguration().get("telemetry.enableTelemetry") == false
-      || workspace.getConfiguration().get("telemetry.enableCrashReporter") == false
+    if (
+      workspace.getConfiguration().get('telemetry.enableTelemetry') === false ||
+      workspace.getConfiguration().get('telemetry.enableCrashReporter') === false
     ) {
-      return "off";
+      return 'off';
     }
     // telemetry is on by default in VS Code and most clones, except for VS Codium (maybe others?)
-    const defaultLevel = PRIVACY_FOCUSED_CLIENTS.some(client => client.test(env.appName ?? "")) ? "off" : "all";
-    return workspace.getConfiguration().get("telemetry.telemetryLevel", defaultLevel);
+    const defaultLevel = PRIVACY_FOCUSED_CLIENTS.some((client) => client.test(env.appName ?? '')) ? 'off' : 'all';
+    return workspace.getConfiguration().get('telemetry.telemetryLevel', defaultLevel);
   }
 
   isTelemetryConfigured(): boolean {
-    return isPreferenceOverridden(CONFIG_KEY + '.enabled');
+    return isPreferenceOverridden(`${CONFIG_KEY}.enabled`);
   }
 
   updateTelemetryEnabledConfig(value: boolean): Thenable<void> {
     return getTelemetryConfiguration().update('enabled', value, true);
   }
 }
-
 
 export function getTelemetryConfiguration(): WorkspaceConfiguration {
   return workspace.getConfiguration(CONFIG_KEY);
@@ -54,5 +54,8 @@ export function didUserDisableTelemetry(): boolean {
   //Telemetry is not enabled, but it might not be the user's choice.
   //i.e. could be the App's default setting (VS Codium), or
   //then the user only asked for reporting errors/crashes, in which case we can do the same.
-  return isPreferenceOverridden("telemetry.telemetryLevel") && workspace.getConfiguration().get("telemetry.telemetryLevel") === "off";
+  return (
+    isPreferenceOverridden('telemetry.telemetryLevel') &&
+    workspace.getConfiguration().get('telemetry.telemetryLevel') === 'off'
+  );
 }

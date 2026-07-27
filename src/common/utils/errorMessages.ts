@@ -1,4 +1,4 @@
-export function toErrorMessage(error: any = null, verbose: boolean = false): string {
+export function toErrorMessage(error: any = null, _verbose: boolean = false): string {
   if (error) {
     if (typeof error === 'string') {
       return error;
@@ -8,5 +8,5 @@ export function toErrorMessage(error: any = null, verbose: boolean = false): str
       return error.message;
     }
   }
-  return "An unknown error occurred. Please consult the log for more details.";
+  return 'An unknown error occurred. Please consult the log for more details.';
 }

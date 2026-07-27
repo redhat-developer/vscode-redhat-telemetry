@@ -1,18 +1,16 @@
-import { IdProvider } from "../common/api/idProvider";
-
-import * as path from 'path';
+import * as path from 'node:path';
+import type { IdProvider } from '../common/api/idProvider';
 import { Logger } from '../common/utils/logger';
-import { generateUUID } from "../common/utils/uuid";
-import { FileSystemStorageService } from "../common/vscode/fileSystemStorageService";
+import { generateUUID } from '../common/utils/uuid';
+import type { FileSystemStorageService } from '../common/vscode/fileSystemStorageService';
 
 let REDHAT_ANONYMOUS_UUID: string | undefined;
 
 /**
-* Service providing the Red Hat anonymous user id, read/stored from the `~/.redhat/anonymousId` file. 
-*/
+ * Service providing the Red Hat anonymous user id, read/stored from the `~/.redhat/anonymousId` file.
+ */
 export class VFSSystemIdProvider implements IdProvider {
-  
-  constructor(private storageService: FileSystemStorageService){}
+  constructor(private storageService: FileSystemStorageService) {}
 
   public async getRedHatUUID(): Promise<string> {
     if (REDHAT_ANONYMOUS_UUID) {
@@ -30,7 +28,7 @@ export class VFSSystemIdProvider implements IdProvider {
         Logger.log(`Written Red Hat UUID: ${REDHAT_ANONYMOUS_UUID} to ${redhatUUIDFilePath}`);
       }
     } catch (e: any) {
-      Logger.log('VFSSystemIdProvider failed to access Red Hat UUID: ' + e?.message);
+      Logger.log(`VFSSystemIdProvider failed to access Red Hat UUID: ${e?.message}`);
     }
     return REDHAT_ANONYMOUS_UUID!;
   }
@@ -38,5 +36,4 @@ export class VFSSystemIdProvider implements IdProvider {
   public getAnonymousIdFile(): string {
     return path.join('.redhat', 'anonymousId');
   }
-
 }

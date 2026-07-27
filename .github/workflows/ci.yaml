@@ -34,6 +34,10 @@ jobs:
     - name: Install dependencies
       run: npm i
 
+      # Lint
+    - name: Lint
+      run: npm run lint
+
       # Build
     - name: Build
       run: npm run prepublish

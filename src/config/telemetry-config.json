@@ -1,58 +1,58 @@
 {
-    "*": {
-        "enabled":"all",
-        "refresh": "12h",
-        "includes": [
-            {
-                "name" : "startup",
-                "dailyLimit": 1
-            },
-            {
-                "name" : "*"
-            }
-        ],
-        "excludes": [
-            {
-                "name": "shutdown",
-                "ratio": "1.0"
-            }
-        ]
-    },
-    "redhat.java": {
-        "enabled": "all",
-        "ratio": "0.5",
-        "includes": [
-            {
-                "name" : "startup",
-                "dailyLimit": 1000
-            }, 
-            {
-                "name" : "*"
-            }
-        ],
-        "excludes": [
-            {
-                "name": "textCompletion",
-                "ratio": "0.997"
-            }
-        ]
-    },
-    "redhat.fabric8-analytics": {
-        "enabled": "all",
-        "ratio": "0.5"
-    },
-    "redhat.vscode-yaml": {
-        "enabled": "all",
-        "ratio": "0.0"
-    },
-    "redhat.vscode-xml": {
-        "enabled": "all",
-        "ratio": "0.0",
-        "excludes": [
-            {
-                "name": "server.document.open",
-                "ratio":"0.9"
-            }
-        ]
-    }
+  "*": {
+    "enabled": "all",
+    "refresh": "12h",
+    "includes": [
+      {
+        "name": "startup",
+        "dailyLimit": 1
+      },
+      {
+        "name": "*"
+      }
+    ],
+    "excludes": [
+      {
+        "name": "shutdown",
+        "ratio": "1.0"
+      }
+    ]
+  },
+  "redhat.java": {
+    "enabled": "all",
+    "ratio": "0.5",
+    "includes": [
+      {
+        "name": "startup",
+        "dailyLimit": 1000
+      },
+      {
+        "name": "*"
+      }
+    ],
+    "excludes": [
+      {
+        "name": "textCompletion",
+        "ratio": "0.997"
+      }
+    ]
+  },
+  "redhat.fabric8-analytics": {
+    "enabled": "all",
+    "ratio": "0.5"
+  },
+  "redhat.vscode-yaml": {
+    "enabled": "all",
+    "ratio": "0.0"
+  },
+  "redhat.vscode-xml": {
+    "enabled": "all",
+    "ratio": "0.0",
+    "excludes": [
+      {
+        "name": "server.document.open",
+        "ratio": "0.9"
+      }
+    ]
+  }
 }

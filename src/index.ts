@@ -1,3 +1,7 @@
 //For legacy compatibility purposes, expose the node bits as default API
-import {getRedHatService, RedHatService, TelemetryService, TelemetryEvent, IdProvider} from './node';
-export {getRedHatService, RedHatService, TelemetryService, TelemetryEvent, IdProvider};
+
+import type { IdProvider, RedHatService, TelemetryEvent, TelemetryService } from './node';
+import { getRedHatService } from './node';
+
+export type { IdProvider, RedHatService, TelemetryEvent, TelemetryService };
+export { getRedHatService };

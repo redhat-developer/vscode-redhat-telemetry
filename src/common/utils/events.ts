@@ -1,6 +1,6 @@
-import { AnalyticsEvent } from '../api/analyticsEvent';
-import { Environment } from '../api/environment';
-import { TelemetryEvent } from '../api/telemetry';
+import type { AnalyticsEvent } from '../api/analyticsEvent';
+import type { Environment } from '../api/environment';
+import type { TelemetryEvent } from '../api/telemetry';
 import { anonymizeFilePaths } from './telemetryUtils';
 
 /**
@@ -94,16 +94,27 @@ import { anonymizeFilePaths } from './telemetryUtils';
  * @param event the event to enhance
  * @param environment the environment data to inject the event with
  */
-export const IGNORED_USERS = ['user', 'gitpod', 'theia', 'vscode', 'redhat']
-export const IGNORED_PROPERTIES = ['extension_name', 'extension_version', 'app_name', 'app_version', 'app_kind', 'app_remote', 'app_host', 'browser_name', 'browser_version', '']
-export const REDACTED_PATH_PROPERTIES = [/error/, /message/, /stacktrace/, /exception/]
+export const IGNORED_USERS = ['user', 'gitpod', 'theia', 'vscode', 'redhat'];
+export const IGNORED_PROPERTIES = [
+  'extension_name',
+  'extension_version',
+  'app_name',
+  'app_version',
+  'app_kind',
+  'app_remote',
+  'app_host',
+  'browser_name',
+  'browser_version',
+  '',
+];
+export const REDACTED_PATH_PROPERTIES = [/error/, /message/, /stacktrace/, /exception/];
 
 export function transform(event: TelemetryEvent, userId: string, environment: Environment): AnalyticsEvent {
   //Inject Client name and version,  Extension id and version, and timezone to the event properties
   const properties = event.properties ? sanitize(event.properties, environment) : {};
-  if (!(event.type) || event.type == 'track') {
-    properties.extension_name = environment.extension.name
-    properties.extension_version = environment.extension.version
+  if (!event.type || event.type === 'track') {
+    properties.extension_name = environment.extension.name;
+    properties.extension_version = environment.extension.version;
     properties.app_name = environment.application.name;
     properties.app_version = environment.application.version;
     if (environment.application.uiKind) {
@@ -125,7 +136,7 @@ export function transform(event: TelemetryEvent, userId: string, environment: En
   }
 
   const traits = event.traits ? sanitize(event.traits, environment) : {};
-  if (event.type == 'identify') {
+  if (event.type === 'identify') {
     //All those traits should be handled by Woopra in the context block, but are not. Meh.
     traits.timezone = environment.timezone;
     traits.os_name = environment.platform.name;
@@ -140,7 +151,7 @@ export function transform(event: TelemetryEvent, userId: string, environment: En
   context.ip = '0.0.0.0';
   context.app = {
     name: environment.application.name,
-    version: environment.application.version
+    version: environment.application.version,
   };
   context.os = {
     name: environment.platform.name,
@@ -150,7 +161,7 @@ export function transform(event: TelemetryEvent, userId: string, environment: En
   context.location = {
     // This is inaccurate in some cases (user uses a different locale than from his actual country),
     // but still provides an interesting metric in most cases.
-    country: environment.country
+    country: environment.country,
   };
   context.timezone = environment.timezone;
 
@@ -161,7 +172,7 @@ export function transform(event: TelemetryEvent, userId: string, environment: En
     properties: properties,
     measures: event.measures,
     traits: traits,
-    context: context
+    context: context,
   };
   return enhancedEvent;
 }
@@ -182,7 +193,7 @@ function sanitize(properties: any, environment: Environment): any {
 
     let sanitizedProperty = isObj ? JSON.stringify(rawProperty) : rawProperty;
 
-    if (REDACTED_PATH_PROPERTIES.some(rpp => rpp.test(p))) {
+    if (REDACTED_PATH_PROPERTIES.some((rpp) => rpp.test(p))) {
       sanitizedProperty = anonymizeFilePaths(sanitizedProperty as string);
     }
 
@@ -191,7 +202,7 @@ function sanitize(properties: any, environment: Environment): any {
       //let's try to deserialize into a sanitized object
       try {
         sanitizedProperty = JSON.parse(sanitizedProperty);
-      } catch (e) {
+      } catch (_e) {
         //We messed up, we'll return the sanitized string instead
       }
     }
@@ -209,5 +220,5 @@ export function isError(event: any): boolean {
 }
 
 function isNonStringPrimitive(test: any) {
-  return typeof test !== "string" && !(test instanceof String) && !isObject(test);
+  return typeof test !== 'string' && !(test instanceof String) && !isObject(test);
 }

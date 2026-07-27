@@ -1,4 +1,4 @@
-import { TelemetryEvent } from '../api/telemetry';
+import type { TelemetryEvent } from '../api/telemetry';
 
 export const MAX_QUEUE_SIZE = 35;
 

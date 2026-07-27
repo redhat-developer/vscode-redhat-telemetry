@@ -1,6 +1,3 @@
-import {
-    getRedHatService,
-    TelemetryService,
-  } from "../../lib/node";
+import { getRedHatService } from '../../lib/node';
 
-console.log("Hello World");
+console.log('Hello World', getRedHatService);
