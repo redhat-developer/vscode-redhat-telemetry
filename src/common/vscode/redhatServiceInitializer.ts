@@ -114,7 +114,7 @@ export abstract class AbstractRedHatServiceProvider {
 
     const message: string = `Help Red Hat improve its extensions by allowing them to collect usage data. 
       Read our [privacy statement](${PRIVACY_STATEMENT_URL}?from=${this.extensionId!}) 
-    and learn how to [opt out](${OPT_OUT_INSTRUCTIONS_URL}?from=${this.extensionId!}).`;
+    and learn how to [opt out](${OPT_OUT_INSTRUCTIONS_URL}).`;
 
     const retryOptin = setTimeout(this.openTelemetryOptInDialogIfNeeded, RETRY_OPTIN_DELAY_IN_MS);
     let selection: string | undefined;
