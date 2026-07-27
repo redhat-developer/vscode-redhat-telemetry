@@ -16,7 +16,7 @@
     "format": "biome format --write .",
     "check": "biome check --write .",
     "lint": "biome check .",
-    "package": "npm run build && esbuild test-webpack/node/index.ts --bundle --platform=node --outfile=dist/node/foo.node.bundle.js --external:vscode",
+    "package": "npm run build && esbuild test-bundle/node/index.ts --bundle --platform=node --outfile=dist/node/foo.node.bundle.js --external:vscode",
     "prepare": "husky"
   },
   "commitlint": {
