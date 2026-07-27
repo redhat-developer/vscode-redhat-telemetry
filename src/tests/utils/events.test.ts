@@ -1,3 +1,4 @@
+import { suite, test } from 'vitest';
 import * as utils from '../../common/utils/events';
 import * as assert from 'assert';
 import { Environment } from '../../common/api/environment';

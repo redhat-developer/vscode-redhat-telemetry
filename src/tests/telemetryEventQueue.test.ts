@@ -1,3 +1,4 @@
+import { suite, test } from "vitest";
 import { TelemetryEvent } from "../common/api/telemetry";
 import {
   TelemetryEventQueue,

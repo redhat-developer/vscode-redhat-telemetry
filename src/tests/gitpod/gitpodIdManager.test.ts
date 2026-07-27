@@ -1,3 +1,4 @@
+import { suite, test, beforeEach, afterEach } from 'vitest';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import { GitpodIdProvider }  from '../../node/cloud/gitpodIdProvider'
@@ -7,12 +8,12 @@ import { FileSystemIdProvider } from '../../node/fileSystemIdManager';
 const redhatDir = `${process.cwd()}/.redhat/`;
 
 suite('Test gitpod Id manager', () => {
-  setup(() => {  
+  beforeEach(() => {
       if (fs.existsSync(redhatDir)) {
         fs.rmSync(redhatDir, { recursive: true, force: true });
       }
     });
-    teardown(() => {
+    afterEach(() => {
       if (fs.existsSync(redhatDir)) {
         fs.rmSync(redhatDir, { recursive: true, force: true });
       }

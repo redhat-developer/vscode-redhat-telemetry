@@ -1,3 +1,4 @@
+import { suite, test } from 'vitest';
 import * as assert from 'assert';
 import { getCountry } from '../../common/utils/geolocation';
 
