@@ -7,7 +7,8 @@
   "scripts": {
     "clean": "rimraf lib/",
     "copy-files": "cpy \"src/config/*\" lib/config/ && cpy \"src/tests/config/*\" lib/tests/config/",
-    "compile": "tsc -b ./tsconfig.json",
+    "compile": "esbuild src/index.ts 'src/common/**/*.ts' 'src/node/**/*.ts' 'src/webworker/*.ts' --outdir=lib --outbase=src --format=cjs --sourcemap --platform=node && tsc -b --emitDeclarationOnly",
+    "typecheck": "tsc -b --noEmit",
     "build": "npm run clean && npm run copy-files && npm run compile",
     "prepublish": "npm run build",
     "coverage": "vitest run --coverage",
