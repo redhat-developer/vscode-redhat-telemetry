@@ -1,3 +1,4 @@
+import { suite, test } from "vitest";
 import * as assert from "assert";
 import { AnalyticsEvent } from "../../common/api/analyticsEvent";
 import { Configuration } from "../../common/impl/configuration";

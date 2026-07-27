@@ -1,4 +1,5 @@
-import * as assert from 'assert';
+import { suite, test } from 'vitest';
+import assert from 'assert';
 import { anonymizeFilePaths } from '../../common/utils/telemetryUtils';
 
 suite('Test anonymizeFilePaths', () => {

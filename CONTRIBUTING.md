@@ -126,9 +126,8 @@ Coverage reports will be generated in the `coverage/` directory.
 ### Test Structure
 
 Tests are located in `src/tests/` and follow the naming pattern `*.test.ts`. The project uses:
-- **Mocha** as the test framework
-- **Chai** for assertions
-- **ts-node** for TypeScript support
+- **Vitest** as the test framework
+- **Node.js assert** for assertions
 
 ## Commit Conventions
 
