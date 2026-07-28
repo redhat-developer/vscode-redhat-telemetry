@@ -3,6 +3,9 @@
   "version": "0.11.0",
   "description": "Provides Telemetry APIs for Red Hat applications",
   "main": "lib/index.js",
+  "engines": {
+    "node": ">=22.14.0"
+  },
   "types": "lib",
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('lib',{recursive:true,force:true})\"",
@@ -41,7 +44,7 @@
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
     "@types/getos": "^3.0.1",
-    "@types/node": "^20.14.8",
+    "@types/node": "^22.0.0",
     "@types/object-hash": "^3.0.2",
     "@types/picomatch": "^4.0.0",
     "@types/ua-parser-js": "^0.7.36",
