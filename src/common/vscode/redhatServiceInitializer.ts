@@ -29,9 +29,10 @@ export abstract class AbstractRedHatServiceProvider {
   context: ExtensionContext;
   constructor(context: ExtensionContext, options?: TelemetryOptions) {
     this.options = options;
-    this.settings = options?.telemetryNamespace
-      ? new CustomVSCodeSettings(options.telemetryNamespace, options.ignoreGlobalTelemetryLevel)
-      : new VSCodeSettings();
+    this.settings =
+      options?.telemetryNamespace !== undefined
+        ? new CustomVSCodeSettings(options.telemetryNamespace, options.ignoreGlobalTelemetryLevel)
+        : new VSCodeSettings();
     this.context = context;
   }
 
@@ -69,12 +70,13 @@ export abstract class AbstractRedHatServiceProvider {
     this.context.subscriptions.push(shutdownHook(telemetryService));
 
     // register preference listener; watches the custom namespace when provided
-    const configNamespace = this.options?.telemetryNamespace
-      ? `${this.options.telemetryNamespace}.telemetry`
-      : undefined;
-    this.context.subscriptions.push(onDidChangeTelemetryEnabled(telemetryService, configNamespace));
+    const configNamespace =
+      this.options?.telemetryNamespace !== undefined ? `${this.options.telemetryNamespace}.telemetry` : undefined;
+    this.context.subscriptions.push(
+      onDidChangeTelemetryEnabled(telemetryService, configNamespace, this.options?.ignoreGlobalTelemetryLevel),
+    );
 
-    this.openTelemetryOptInDialogIfNeeded();
+    this.openTelemetryOptInDialogIfNeeded().catch((err) => Logger.log(err));
 
     telemetryService.send({
       type: 'identify',
@@ -187,11 +189,17 @@ export function buildOptInMessage(options: TelemetryOptions | undefined, extensi
  *                           custom pipelines. When absent, watches `"redhat.telemetry"` and
  *                           `"telemetry"` (existing behavior).
  */
-export function onDidChangeTelemetryEnabled(telemetryService: TelemetryService, configNamespace?: string): Disposable {
+export function onDidChangeTelemetryEnabled(
+  telemetryService: TelemetryService,
+  configNamespace?: string,
+  ignoreGlobalTelemetryLevel = false,
+): Disposable {
   const watchedNamespace = configNamespace ?? 'redhat.telemetry';
   return workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
     const affectsNamespace = e.affectsConfiguration(watchedNamespace);
-    const affectsGlobal = !configNamespace && e.affectsConfiguration('telemetry');
+    // Only react to VS Code's global telemetry setting when using the default
+    // pipeline AND the caller hasn't opted out of the global level.
+    const affectsGlobal = !configNamespace && !ignoreGlobalTelemetryLevel && e.affectsConfiguration('telemetry');
     if (affectsNamespace || affectsGlobal) {
       telemetryService.flushQueue();
     }

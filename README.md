@@ -239,8 +239,11 @@ export async function activate(context: ExtensionContext) {
 
 Once telemetry is in place, you need to document the extent of the telemetry collection performed by your extension.
 * add a USAGE_DATA.md page to your extension's repository, listing the type of data being collected by your extension.
-* add a `Data and Telemetry` paragraph at the end of your extension's README file:
-> `The ***** extension collects anonymous [usage data](USAGE_DATA.md) and sends it to Red Hat servers to help improve our products and services. Read our [privacy statement](https://developers.redhat.com/article/tool-data-collection) to learn more. This extension respects the `redhat.telemetry.enabled` setting which you can learn more about at https://github.com/redhat-developer/vscode-redhat-telemetry#how-to-disable-telemetry-reporting`
+* add a `Data and Telemetry` paragraph at the end of your extension's README file.
+  * **Default API** (no `telemetryNamespace`):
+    > `The ***** extension collects anonymous [usage data](USAGE_DATA.md) and sends it to Red Hat servers to help improve our products and services. Read our [privacy statement](https://developers.redhat.com/article/tool-data-collection) to learn more. This extension respects the `redhat.telemetry.enabled` setting which you can learn more about at https://github.com/redhat-developer/vscode-redhat-telemetry#how-to-disable-telemetry-reporting`
+  * **Custom namespace** (`telemetryNamespace: "<ns>"`): replace `redhat.telemetry.enabled` with `<ns>.telemetry.enabled` in the disclosure, since the `redhat.telemetry.enabled` setting has no effect on this pipeline.
+    > `The ***** extension collects anonymous [usage data](USAGE_DATA.md) and sends it to Red Hat servers to help improve our products and services. Read our [privacy statement](https://developers.redhat.com/article/tool-data-collection) to learn more. This extension respects the `<ns>.telemetry.enabled` setting.`
 
 * add a reference to your telemetry documentation page to this repository's own [USAGE_DATA.md](https://github.com/redhat-developer/vscode-redhat-telemetry/blob/HEAD/USAGE_DATA.md#other-extensions).
 

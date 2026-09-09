@@ -85,6 +85,20 @@ describe('onDidChangeTelemetryEnabled', () => {
       expect(flushQueue).not.toHaveBeenCalled();
     });
   });
+
+  describe('default pipeline with ignoreGlobalTelemetryLevel: true', () => {
+    it('flushes queue when redhat.telemetry changes', () => {
+      onDidChangeTelemetryEnabled(telemetryService, undefined, true);
+      fireConfigChange(['redhat.telemetry']);
+      expect(flushQueue).toHaveBeenCalledTimes(1);
+    });
+
+    it('does NOT flush queue when VS Code global telemetry changes', () => {
+      onDidChangeTelemetryEnabled(telemetryService, undefined, true);
+      fireConfigChange(['telemetry']);
+      expect(flushQueue).not.toHaveBeenCalled();
+    });
+  });
 });
 
 describe('buildOptInMessage', () => {

@@ -3,10 +3,11 @@ export interface TelemetryOptions {
   /**
    * Namespace prefix for the custom VS Code setting. The library reads/writes
    * `<telemetryNamespace>.telemetry.enabled`. Must be declared in `contributes.configuration`.
+   * An empty string is rejected at construction time.
    */
   telemetryNamespace?: string;
 
-  /** Custom opt-in dialog message. Falls back to the default Red Hat message when absent. */
+  /** Custom opt-in dialog message. Required (and validated at startup) when `telemetryNamespace` is set. */
   optInMessage?: string;
 
   /** Overrides the privacy statement URL in the opt-in dialog. */
