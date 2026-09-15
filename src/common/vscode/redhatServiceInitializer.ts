@@ -207,9 +207,8 @@ export function onDidChangeTelemetryEnabled(
   const watchedNamespace = configNamespace ?? 'redhat.telemetry';
   return workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
     const affectsNamespace = e.affectsConfiguration(watchedNamespace);
-    // Only react to VS Code's global telemetry setting when using the default
-    // pipeline AND the caller hasn't opted out of the global level.
-    const affectsGlobal = !configNamespace && !ignoreGlobalTelemetryLevel && e.affectsConfiguration('telemetry');
+    // React to global telemetry changes unless ignoreGlobalTelemetryLevel is true.
+    const affectsGlobal = !ignoreGlobalTelemetryLevel && e.affectsConfiguration('telemetry');
     if (affectsNamespace || affectsGlobal) {
       telemetryService.flushQueue();
     }

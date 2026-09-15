@@ -74,9 +74,15 @@ describe('onDidChangeTelemetryEnabled', () => {
     });
 
     it('does NOT flush queue when VS Code global telemetry changes (custom pipeline is isolated)', () => {
-      onDidChangeTelemetryEnabled(telemetryService, 'myext.telemetry');
+      onDidChangeTelemetryEnabled(telemetryService, 'myext.telemetry', true);
       fireConfigChange(['telemetry']);
       expect(flushQueue).not.toHaveBeenCalled();
+    });
+
+    it('flushes queue when VS Code global telemetry changes (custom pipeline honors global telemetry)', () => {
+      onDidChangeTelemetryEnabled(telemetryService, 'myext.telemetry', false);
+      fireConfigChange(['telemetry']);
+      expect(flushQueue).toHaveBeenCalledTimes(1);
     });
 
     it('does NOT flush queue when an unrelated config changes', () => {
