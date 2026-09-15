@@ -106,11 +106,16 @@ export abstract class AbstractRedHatServiceProvider {
       popupInfo = JSON.parse(rawdata);
     }
     if (popupInfo) {
-      if (popupInfo.sessionId !== env.sessionId || popupInfo.owner !== this.extensionId) {
-        //someone else is showing the popup, bail.
+      if (popupInfo.sessionId !== env.sessionId) {
+        // Stale lock from a previous session — clean it up and re-acquire.
+        safeCleanup(optinPopupInfo);
+        popupInfo = undefined;
+      } else if (popupInfo.owner !== this.extensionId) {
+        // Another extension in this session owns the popup.
         return;
       }
-    } else {
+    }
+    if (!popupInfo) {
       popupInfo = {
         owner: this.extensionId!,
         sessionId: env.sessionId,
