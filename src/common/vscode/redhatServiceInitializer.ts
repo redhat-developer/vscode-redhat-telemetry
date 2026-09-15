@@ -154,15 +154,16 @@ export abstract class AbstractRedHatServiceProvider {
  * Uses custom text/URLs from `options` when provided; falls back to Red Hat defaults.
  */
 export function buildOptInMessage(options: TelemetryOptions | undefined, extensionId: string): string {
-  if (options?.telemetryNamespace && !options.optInMessage) {
-    throw new Error(
-      `TelemetryOptions.optInMessage is required when telemetryNamespace is set (namespace: "${options.telemetryNamespace}"). ` +
-        'The default opt-in message uses Red Hat branding, which is incorrect for third-party consumers.',
+  if (options?.telemetryNamespace) {
+    const missing = (['optInMessage', 'privacyStatementUrl', 'optOutInstructionsUrl'] as const).filter(
+      (k) => !options[k],
     );
-  }
-
-  if (options?.optInMessage) {
-    return options.optInMessage;
+    if (missing.length > 0) {
+      throw new Error(
+        `TelemetryOptions.${missing.join(', ')} are required when telemetryNamespace is set (namespace: "${options.telemetryNamespace}"). ` +
+          'The defaults use Red Hat branding, which is incorrect for third-party consumers.',
+      );
+    }
   }
 
   const privacyUrl = options?.privacyStatementUrl ?? PRIVACY_STATEMENT_URL;
@@ -179,9 +180,13 @@ export function buildOptInMessage(options: TelemetryOptions | undefined, extensi
     privacyUrlStr = `${privacyUrl}${separator}from=${encodeURIComponent(extensionId)}`;
   }
 
-  return `Help Red Hat improve its extensions by allowing them to collect usage data.
-      Read our [privacy statement](${privacyUrlStr})
-    and learn how to [opt out](${optOutUrl}).`;
+  const suffix = ` Read our [privacy statement](${privacyUrlStr}) and learn how to [opt out](${optOutUrl}).`;
+
+  if (options?.optInMessage) {
+    return `${options.optInMessage}${suffix}`;
+  }
+
+  return `Help Red Hat improve its extensions by allowing them to collect usage data.${suffix}`;
 }
 
 /**

@@ -104,9 +104,11 @@ describe('onDidChangeTelemetryEnabled', () => {
 describe('buildOptInMessage', () => {
   const EXT_ID = 'my.extension';
 
-  it('returns the custom message verbatim when optInMessage is set', () => {
+  it('appends privacy/opt-out suffix to a custom optInMessage', () => {
     const msg = buildOptInMessage({ optInMessage: 'Custom message.' }, EXT_ID);
-    expect(msg).toBe('Custom message.');
+    expect(msg).toContain('Custom message.');
+    expect(msg).toContain('privacy statement');
+    expect(msg).toContain('opt out');
   });
 
   it('appends from= as a proper query parameter for a plain custom URL', () => {
@@ -163,15 +165,29 @@ describe('buildOptInMessage', () => {
     expect(msg).toContain('/privacy?locale=en&from=');
   });
 
-  it('throws when telemetryNamespace is set but optInMessage is absent', () => {
+  it('throws when telemetryNamespace is set but required fields are absent', () => {
     expect(() => buildOptInMessage({ telemetryNamespace: 'myext' }, EXT_ID)).toThrow(
-      'TelemetryOptions.optInMessage is required when telemetryNamespace is set',
+      'are required when telemetryNamespace is set',
     );
   });
 
-  it('does not throw when both telemetryNamespace and optInMessage are provided', () => {
+  it('throws when telemetryNamespace is set but only optInMessage is provided', () => {
+    expect(() => buildOptInMessage({ telemetryNamespace: 'myext', optInMessage: 'Custom text.' }, EXT_ID)).toThrow(
+      'are required when telemetryNamespace is set',
+    );
+  });
+
+  it('does not throw when telemetryNamespace and all required fields are provided', () => {
     expect(() =>
-      buildOptInMessage({ telemetryNamespace: 'myext', optInMessage: 'Custom text.' }, EXT_ID),
+      buildOptInMessage(
+        {
+          telemetryNamespace: 'myext',
+          optInMessage: 'Custom text.',
+          privacyStatementUrl: 'https://example.com/privacy',
+          optOutInstructionsUrl: 'https://example.com/opt-out',
+        },
+        EXT_ID,
+      ),
     ).not.toThrow();
   });
 });
