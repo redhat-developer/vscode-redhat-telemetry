@@ -7,16 +7,15 @@ on:
       - '*'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+permissions:
+  contents: write  # Required for creating releases
+  id-token: write  # Required for npm trusted publishing (OIDC)
+
 jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-    permissions:
-      contents: write  # Required for creating releases
+    runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -25,11 +24,14 @@ jobs:
         fetch-depth: 0  # Fetch full history for changelog generation
 
       # Set up Node
-    - name: Use Node 20
+    - name: Use Node 22
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 22
         registry-url: 'https://registry.npmjs.org'
+
+    - name: Use npm 12
+      run: npm install npm@^12 -g
 
       # Run install dependencies
     - name: Install dependencies
@@ -79,8 +81,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Publish to npm
+      # Publish to npm using trusted publishing (OIDC)
     - name: Publish to npm
       run: npm publish --access public
-      env:
-        NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
