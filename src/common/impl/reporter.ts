@@ -9,9 +9,12 @@ import { Logger } from '../utils/logger';
  * Sends Telemetry events to a segment.io backend
  */
 export class Reporter implements IReporter {
+  private identifyInFlight: Promise<void> | undefined;
+
   constructor(
     private analytics?: CoreAnalytics,
     private cacheService?: CacheService,
+    private writeKey?: string,
   ) {}
 
   public async report(event: AnalyticsEvent): Promise<void> {
@@ -22,16 +25,22 @@ export class Reporter implements IReporter {
     try {
       switch (event.type) {
         case 'identify': {
-          //Avoid identifying the user several times, until some data has changed.
-          const hash = sha1(payloadString);
-          const cached = await this.cacheService?.get('identify');
-          if (hash === cached) {
-            Logger.log(`Skipping 'identify' event! Already sent:\n${payloadString}`);
-            return;
-          }
-          Logger.log(`Sending 'identify' event with\n${payloadString}`);
-          await this.analytics?.identify(event);
-          this.cacheService?.put('identify', hash);
+          // Skip if we already sent an identify event today.
+          const identifyCacheName = this.getIdentifyCacheName();
+          this.identifyInFlight = (this.identifyInFlight ?? Promise.resolve())
+            .then(async () => {
+              const hash = sha1(payloadString);
+              const cached = await this.cacheService?.get(identifyCacheName);
+              if (hash === cached) {
+                Logger.log(`Skipping 'identify' event! Already sent:\n${payloadString}`);
+                return;
+              }
+              Logger.log(`Sending 'identify' event with\n${payloadString}`);
+              await this.analytics?.identify(event);
+              await this.cacheService?.put(identifyCacheName, hash);
+            })
+            .catch((e) => Logger.log(`Failed to send 'identify' event ${toErrorMessage(e)}`));
+          await this.identifyInFlight;
           break;
         }
         case 'track':
@@ -61,6 +70,11 @@ export class Reporter implements IReporter {
     if (isCloseAndFlusheable(this.analytics)) {
       return this.analytics.closeAndFlush();
     }
+  }
+
+  private getIdentifyCacheName(): string {
+    // Fall back to "identify" when no writeKey is set (backward compat).
+    return this.writeKey ? `${this.writeKey}-identify` : 'identify';
   }
 }
 

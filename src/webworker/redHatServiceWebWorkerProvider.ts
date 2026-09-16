@@ -4,6 +4,7 @@ import { EventCacheService } from '../common/impl/eventCacheService';
 import { Reporter } from '../common/impl/reporter';
 import { TelemetryServiceBuilder } from '../common/telemetryServiceBuilder';
 import { getExtension, getPackageJson } from '../common/utils/extensions';
+import { getSegmentKey } from '../common/utils/keyLocator';
 import { FileSystemStorageService } from '../common/vscode/fileSystemStorageService';
 import { AbstractRedHatServiceProvider } from '../common/vscode/redhatServiceInitializer';
 import { getEnvironment } from './platform';
@@ -15,7 +16,11 @@ export class RedHatServiceWebWorkerProvider extends AbstractRedHatServiceProvide
     const extensionId = extensionInfo.id;
     const packageJson = getPackageJson(extensionInfo);
     const storageService = new FileSystemStorageService(this.getCachePath());
-    const reporter = new Reporter(this.getSegmentApi(packageJson), new EventCacheService(storageService));
+    const reporter = new Reporter(
+      this.getSegmentApi(packageJson),
+      new EventCacheService(storageService),
+      getSegmentKey(packageJson),
+    );
     const idManager = new VFSSystemIdProvider(storageService);
     const builder = new TelemetryServiceBuilder(packageJson)
       .setContext(this.context)
