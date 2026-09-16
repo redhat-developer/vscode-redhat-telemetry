@@ -167,12 +167,83 @@ Once your extension is deactivated, a shutdown event, including the session dura
 All event properties are automatically sanitized to anonymize all paths (best effort) and references to the username.
 
 
+## Custom Telemetry Namespace
+
+By default this library gates telemetry on `redhat.telemetry.enabled`. If you need an **independent** pipeline controlled by your own VS Code setting (so your enablement state is not shared with, or affected by, Red Hat extensions), you can supply a `TelemetryOptions` object as the second argument to `getRedHatService()`.
+
+### 1. Declare the configuration key in your `package.json`
+
+> ⚠️ **Required.** If you omit this declaration VS Code silently returns `undefined` for the key,
+> which defaults to `false` and permanently silences your telemetry pipeline with no error message.
+
+```json
+"contributes": {
+  "configuration": {
+    "properties": {
+      "myext.telemetry.enabled": {
+        "type": "boolean",
+        "default": null,
+        "markdownDescription": "Enable usage data to be sent. Read our [privacy statement](https://example.com/privacy).",
+        "tags": ["telemetry", "usesOnlineServices"],
+        "scope": "window"
+      }
+    }
+  }
+}
+```
+
+Replace `myext` with your own namespace prefix. The library always appends `.telemetry.enabled` internally.
+
+### 2. Pass `TelemetryOptions` to `getRedHatService()`
+
+```typescript
+import { getRedHatService, TelemetryService, TelemetryOptions } from "@redhat-developer/vscode-redhat-telemetry";
+
+let telemetryService: TelemetryService = null;
+
+export async function activate(context: ExtensionContext) {
+  const options: TelemetryOptions = {
+    // Required: the namespace prefix. Reads/writes `myext.telemetry.enabled`.
+    telemetryNamespace: 'myext',
+
+    // Required when telemetryNamespace is set — the default message uses Red Hat branding.
+    optInMessage: 'Help us improve this extension by sending anonymous usage data.',
+
+    // Optional: override the privacy-statement URL shown in the dialog.
+    privacyStatementUrl: 'https://example.com/privacy',
+
+    // Optional: override the opt-out instructions URL shown in the dialog.
+    optOutInstructionsUrl: 'https://example.com/opt-out',
+  };
+
+  const redhatService = await getRedHatService(context, options);
+  telemetryService = await redhatService.getTelemetryService();
+  telemetryService.sendStartupEvent();
+}
+```
+
+### Behavior notes
+
+| Scenario | Behavior |
+|---|---|
+| `telemetryNamespace` provided | Library reads/writes `<namespace>.telemetry.enabled`; `redhat.telemetry.enabled` is ignored entirely for this pipeline |
+| `telemetryNamespace` omitted | All existing behavior is unchanged — `redhat.telemetry.enabled` is used as before |
+| Opt-in dialog lock file | Stored as `<namespace>.optin.json` — independent from `redhat.optin.json` |
+| `optInMessage` omitted when `telemetryNamespace` is set | Throws — `optInMessage` is required to avoid Red Hat branding appearing in a third-party extension |
+| `optInMessage` omitted when `telemetryNamespace` is not set | Falls back to the default Red Hat opt-in message |
+| `privacyStatementUrl` / `optOutInstructionsUrl` omitted | Falls back to the Red Hat default URLs |
+
+---
+
 ## Publicly document your data collection
 
 Once telemetry is in place, you need to document the extent of the telemetry collection performed by your extension.
 * add a USAGE_DATA.md page to your extension's repository, listing the type of data being collected by your extension.
-* add a `Data and Telemetry` paragraph at the end of your extension's README file:
-> `The ***** extension collects anonymous [usage data](USAGE_DATA.md) and sends it to Red Hat servers to help improve our products and services. Read our [privacy statement](https://developers.redhat.com/article/tool-data-collection) to learn more. This extension respects the `redhat.telemetry.enabled` setting which you can learn more about at https://github.com/redhat-developer/vscode-redhat-telemetry#how-to-disable-telemetry-reporting`
+* add a `Data and Telemetry` paragraph at the end of your extension's README file.
+  * **Default API** (no `telemetryNamespace`):
+    > The ***** extension collects anonymous [usage data](USAGE_DATA.md) and sends it to Red Hat servers to help improve our products and services. Read our [privacy statement](<your-privacy-statement-url>) to learn more. This extension respects the `redhat.telemetry.enabled` setting which you can learn more about at https://github.com/redhat-developer/vscode-redhat-telemetry#how-to-disable-telemetry-reporting
+  * **Custom namespace** (`telemetryNamespace: "<ns>"`): replace `redhat.telemetry.enabled` with `<ns>.telemetry.enabled` in the disclosure, since the `redhat.telemetry.enabled` setting has no effect on this pipeline.
+    > The ***** extension collects anonymous [usage data](USAGE_DATA.md) and sends it to Red Hat servers to help improve our products and services. Read our [privacy statement](<your-privacy-statement-url>) to learn more. This extension respects the `<ns>.telemetry.enabled` setting.
 
 * add a reference to your telemetry documentation page to this repository's own [USAGE_DATA.md](https://github.com/redhat-developer/vscode-redhat-telemetry/blob/HEAD/USAGE_DATA.md#other-extensions).
 

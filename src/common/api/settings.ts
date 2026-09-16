@@ -15,4 +15,7 @@ export interface TelemetrySettings {
    * Returns the telemetry level: value can be either "off", "all", "error" or "crash"
    */
   getTelemetryLevel(): string | undefined;
+
+  // Persists the opt-in/out choice to the correct VS Code configuration key for this pipeline.
+  updateTelemetryEnabledConfig(value: boolean): Thenable<void>;
 }
