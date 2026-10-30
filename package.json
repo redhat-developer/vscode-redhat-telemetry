@@ -44,7 +44,6 @@
     "@types/node": "^20.14.8",
     "@types/object-hash": "^3.0.2",
     "@types/picomatch": "^4.0.0",
-    "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^10.0.0",
     "@types/vscode": "1.75.1",
     "@vitest/coverage-v8": "^4.1.10",
@@ -55,12 +54,12 @@
   },
   "dependencies": {
     "@segment/analytics-node": "2.3.0",
+    "bowser": "^2.15.0",
     "countries-and-timezones": "^3.4.1",
     "getos": "^3.2.1",
     "object-hash": "^3.0.0",
     "os-locale": "^5.0.0",
     "picomatch": "^4.0.2",
-    "ua-parser-js": "2.0.10",
     "uuid": "^14.0.1"
   }
 }
