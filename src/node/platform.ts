@@ -1,21 +1,17 @@
 import os from 'node:os';
 import { promisify } from 'node:util';
 import getos, { type LinuxOs } from 'getos';
-// Can't use os-locale 6.x as it's an ESM module, incompatible with running VS Code electron tests
-// See https://github.com/redhat-developer/vscode-redhat-telemetry/issues/30
-//import { osLocaleSync } from 'os-locale';
-import osLocaleSync from 'os-locale';
 import { UIKind, version, env as vscodeEnv } from 'vscode';
 import type { Environment } from '../common/api/environment';
 import env from '../common/envVar';
 import { getCountry } from '../common/utils/geolocation';
+import { getLocale } from '../common/utils/locale';
 
 export const PLATFORM = getPlatform();
 export const DISTRO = getDistribution();
 export const PLATFORM_VERSION = os.release();
 export const TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
-//export const LOCALE = osLocaleSync().replace('_', '-');
-export const LOCALE = osLocaleSync.sync().replace('_', '-');
+export const LOCALE = getLocale();
 export const COUNTRY = getCountry(TIMEZONE);
 export const UI_KIND = getUIKind();
 export const USERNAME = getUsername();
