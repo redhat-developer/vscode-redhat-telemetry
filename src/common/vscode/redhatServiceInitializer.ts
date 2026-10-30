@@ -9,23 +9,30 @@ import {
   workspace,
 } from 'vscode';
 import type { RedHatService } from '../api/redhatService';
+import type { TelemetrySettings } from '../api/settings';
 import type { TelemetryService } from '../api/telemetry';
-import { OPT_OUT_INSTRUCTIONS_URL, PRIVACY_STATEMENT_URL } from '../impl/constants';
+import type { TelemetryOptions } from '../api/telemetryOptions';
+import { CONFIG_KEY, OPT_OUT_INSTRUCTIONS_URL, PRIVACY_STATEMENT_URL } from '../impl/constants';
 import { type ExtensionInfo, getExtension } from '../utils/extensions';
 import { getSegmentKey } from '../utils/keyLocator';
 import { Logger } from '../utils/logger';
 import { deleteFile, exists, readFile, writeFile } from '../vscode/fsUtils';
-import { didUserDisableTelemetry, VSCodeSettings } from '../vscode/settings';
+import { CustomVSCodeSettings, didUserDisableTelemetry, VSCodeSettings } from '../vscode/settings';
 
 const RETRY_OPTIN_DELAY_IN_MS = 24 * 60 * 60 * 1000; // 24h
 
 export abstract class AbstractRedHatServiceProvider {
-  settings: VSCodeSettings;
+  settings: TelemetrySettings;
+  options?: TelemetryOptions;
   extensionInfo?: ExtensionInfo;
   extensionId?: string;
   context: ExtensionContext;
-  constructor(context: ExtensionContext) {
-    this.settings = new VSCodeSettings();
+  constructor(context: ExtensionContext, options?: TelemetryOptions) {
+    this.options = options;
+    this.settings =
+      options?.telemetryNamespace !== undefined
+        ? new CustomVSCodeSettings(options.telemetryNamespace, options.ignoreGlobalTelemetryLevel)
+        : new VSCodeSettings();
     this.context = context;
   }
 
@@ -45,8 +52,8 @@ export abstract class AbstractRedHatServiceProvider {
 
   /**
    * Returns a new `RedHatService` instance for a Visual Studio Code extension. For telemetry, the following is performed:
-   * - A preference listener enables/disables  telemetry based on changes to `redhat.telemetry.enabled`
-   * - If `redhat.telemetry.enabled` is not set, a popup requesting telemetry opt-in will be displayed
+   * - A preference listener enables/disables telemetry based on changes to the configured telemetry key
+   * - If the telemetry key is not set, a popup requesting telemetry opt-in will be displayed
    * - when the extension is deactivated, a telemetry shutdown event will be emitted (if telemetry is enabled)
    *
    * @param context the extension's context
@@ -62,11 +69,14 @@ export abstract class AbstractRedHatServiceProvider {
     // register disposable to send shutdown event
     this.context.subscriptions.push(shutdownHook(telemetryService));
 
-    // register preference listener for that extension,
-    // so it stops/starts sending data when redhat.telemetry.enabled changes
-    this.context.subscriptions.push(onDidChangeTelemetryEnabled(telemetryService));
+    // register preference listener; watches the custom namespace when provided
+    const configNamespace =
+      this.options?.telemetryNamespace !== undefined ? `${this.options.telemetryNamespace}.telemetry` : undefined;
+    this.context.subscriptions.push(
+      onDidChangeTelemetryEnabled(telemetryService, configNamespace, this.options?.ignoreGlobalTelemetryLevel),
+    );
 
-    this.openTelemetryOptInDialogIfNeeded();
+    this.openTelemetryOptInDialogIfNeeded().catch((err) => Logger.log(err));
 
     telemetryService.send({
       type: 'identify',
@@ -87,18 +97,25 @@ export abstract class AbstractRedHatServiceProvider {
 
     let popupInfo: PopupInfo | undefined;
 
+    const lockNamespace = this.options?.telemetryNamespace ?? CONFIG_KEY.split('.')[0];
+    const lockFilename = `${lockNamespace}.optin.json`;
     const parentDir = this.getTelemetryWorkingDir(this.context);
-    const optinPopupInfo = Uri.joinPath(parentDir, 'redhat.optin.json');
+    const optinPopupInfo = Uri.joinPath(parentDir, lockFilename);
     if (await exists(optinPopupInfo)) {
       const rawdata = await readFile(optinPopupInfo);
       popupInfo = JSON.parse(rawdata);
     }
     if (popupInfo) {
-      if (popupInfo.sessionId !== env.sessionId || popupInfo.owner !== this.extensionId) {
-        //someone else is showing the popup, bail.
+      if (popupInfo.sessionId !== env.sessionId) {
+        // Stale lock from a previous session — clean it up and re-acquire.
+        safeCleanup(optinPopupInfo);
+        popupInfo = undefined;
+      } else if (popupInfo.owner !== this.extensionId) {
+        // Another extension in this session owns the popup.
         return;
       }
-    } else {
+    }
+    if (!popupInfo) {
       popupInfo = {
         owner: this.extensionId!,
         sessionId: env.sessionId,
@@ -112,9 +129,7 @@ export abstract class AbstractRedHatServiceProvider {
       });
     }
 
-    const message: string = `Help Red Hat improve its extensions by allowing them to collect usage data. 
-      Read our [privacy statement](${PRIVACY_STATEMENT_URL}?from=${this.extensionId!}) 
-    and learn how to [opt out](${OPT_OUT_INSTRUCTIONS_URL}).`;
+    const message: string = buildOptInMessage(this.options, this.extensionId!);
 
     const retryOptin = setTimeout(this.openTelemetryOptInDialogIfNeeded, RETRY_OPTIN_DELAY_IN_MS);
     let selection: string | undefined;
@@ -134,16 +149,70 @@ export abstract class AbstractRedHatServiceProvider {
   }
 }
 
-function onDidChangeTelemetryEnabled(telemetryService: TelemetryService): Disposable {
-  return workspace.onDidChangeConfiguration(
-    //as soon as user changed the redhat.telemetry setting, we consider
-    //opt-in (or out) has been set, so whichever the choice is, we flush the queue
-    (e: ConfigurationChangeEvent) => {
-      if (e.affectsConfiguration('redhat.telemetry') || e.affectsConfiguration('telemetry')) {
-        telemetryService.flushQueue();
-      }
-    },
-  );
+/**
+ * Builds the opt-in dialog message string. Exported for unit testing.
+ * Uses custom text/URLs from `options` when provided; falls back to Red Hat defaults.
+ */
+export function buildOptInMessage(options: TelemetryOptions | undefined, extensionId: string): string {
+  if (options?.telemetryNamespace) {
+    const missing = (['optInMessage', 'privacyStatementUrl', 'optOutInstructionsUrl'] as const).filter(
+      (k) => !options[k],
+    );
+    if (missing.length > 0) {
+      throw new Error(
+        `TelemetryOptions.${missing.join(', ')} are required when telemetryNamespace is set (namespace: "${options.telemetryNamespace}"). ` +
+          'The defaults use Red Hat branding, which is incorrect for third-party consumers.',
+      );
+    }
+  }
+
+  const privacyUrl = options?.privacyStatementUrl ?? PRIVACY_STATEMENT_URL;
+  const optOutUrl = options?.optOutInstructionsUrl ?? OPT_OUT_INSTRUCTIONS_URL;
+
+  let privacyUrlStr: string;
+  try {
+    const parsed = new URL(privacyUrl);
+    parsed.searchParams.set('from', extensionId);
+    privacyUrlStr = parsed.toString();
+  } catch {
+    // Relative or malformed URL — append query string manually.
+    const separator = privacyUrl.includes('?') ? '&' : '?';
+    privacyUrlStr = `${privacyUrl}${separator}from=${encodeURIComponent(extensionId)}`;
+  }
+
+  const suffix = ` Read our [privacy statement](${privacyUrlStr}) and learn how to [opt out](${optOutUrl}).`;
+
+  if (options?.optInMessage) {
+    return `${options.optInMessage}${suffix}`;
+  }
+
+  return `Help Red Hat improve its extensions by allowing them to collect usage data.${suffix}`;
+}
+
+/**
+ * Registers a configuration change listener that flushes the telemetry queue whenever the
+ * telemetry enablement setting changes.
+ *
+ * @param telemetryService - the service whose queue will be flushed
+ * @param configNamespace  - when provided (e.g. `"myext.telemetry"`), watches only that
+ *                           namespace. VS Code's global `"telemetry"` is not watched for
+ *                           custom pipelines. When absent, watches `"redhat.telemetry"` and
+ *                           `"telemetry"` (existing behavior).
+ */
+export function onDidChangeTelemetryEnabled(
+  telemetryService: TelemetryService,
+  configNamespace?: string,
+  ignoreGlobalTelemetryLevel = false,
+): Disposable {
+  const watchedNamespace = configNamespace ?? 'redhat.telemetry';
+  return workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
+    const affectsNamespace = e.affectsConfiguration(watchedNamespace);
+    // React to global telemetry changes unless ignoreGlobalTelemetryLevel is true.
+    const affectsGlobal = !ignoreGlobalTelemetryLevel && e.affectsConfiguration('telemetry');
+    if (affectsNamespace || affectsGlobal) {
+      telemetryService.flushQueue();
+    }
+  });
 }
 
 interface PopupInfo {
