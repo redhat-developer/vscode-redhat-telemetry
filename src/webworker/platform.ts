@@ -1,51 +1,12 @@
-import { type IResult, UAParser } from 'ua-parser-js';
 import { UIKind, version, env as vscodeEnv } from 'vscode';
 import type { Environment } from '../common/api/environment';
 import env from '../common/envVar';
 import { getCountry } from '../common/utils/geolocation';
+import { parseUserAgent } from './userAgent';
 
-let userAgentInfo: IResult;
-
-function getUAInfo() {
-  if (userAgentInfo) {
-    return userAgentInfo;
-  }
-  userAgentInfo = new UAParser(navigator.userAgent).getResult();
-  return userAgentInfo;
-}
-
-// list of known Linux distros given by ChatGPT ;-), tweaked a bit
-const linuxes =
-  /^((.*)Ubuntu(.*)|Debian|Fedora|CentOS|Red Hat|(.*)Linux(.*)|Gentoo|(.*)SUSE(.*)|Slackware|Solus|Manjaro|Raspbian|Elementary OS|Zorin OS|Pop!_OS|Endless OS|Deepin|Tails|BlackArch|BackBox|Parrot Security|Knoppix|Peppermint|LXLE|Chrome OS|CrunchBang|Finnix|FreeNAS|gNewSense|NimbleX|NixOS|Ophcrack|PFSense|pfSense|Sabayon|SliTaz|Zenwalk|ArchBang|ArchLabs|Artix|BlankOn|BlueOnyx|Calcula|Calculate|CRUX|Devuan|Frugalware|Funtoo|GParted|Joli OS|Kanotix|Lakka|Linspire|Madbox|Makulu|NimbleX|NixOS|NST|OpenELEC|OpenIndiana|OpenMandriva|OpenVZ|Q4OS|Qubes OS|ReactOS|Sabayon|Salix|Slackel|Slackware|Slax|SmartOS|SME Server|Sonic|SystemRescueCd|Trisquel|TrueOS|VyOS|XenServer|Zorin OS|CRUX)$/i;
-
-function getPlatform(): string {
-  const platform: string = getUAInfo().os.name ? getUAInfo().os.name! : 'Unknown';
-  if (platform.startsWith('Windows')) {
-    return 'Windows';
-  }
-  if (platform.startsWith('Mac')) {
-    return 'Mac';
-  }
-  if (platform.toLowerCase().indexOf('BSD') > -1) {
-    return 'BSD';
-  }
-  //This is brittle AF. Testing against a bunch of hardcoded distros, the list can only go stale,
-  //but we want to limit the amount of platforms here
-  if (linuxes.test(platform)) {
-    return 'Linux';
-  }
-  return 'Unknown';
-}
-function getDistribution(): string | undefined {
-  const os = getPlatform();
-  if (os === 'Linux' || os === 'Unknown' || (os === 'BSD' && getUAInfo().os.name)) {
-    return getUAInfo().os.name;
-  }
-  return undefined;
-}
+const userAgentInfo = parseUserAgent(navigator.userAgent);
 
 export async function getEnvironment(extensionId: string, extensionVersion: string): Promise<Environment> {
-  const browser = getUAInfo().browser;
   return {
     extension: {
       name: extensionId,
@@ -64,8 +25,8 @@ export async function getEnvironment(extensionId: string, extensionVersion: stri
       distribution: DISTRO,
     },
     browser: {
-      name: browser.name,
-      version: browser.version,
+      name: userAgentInfo.browser.name,
+      version: userAgentInfo.browser.version,
     },
     timezone: TIMEZONE,
     locale: LOCALE,
@@ -89,9 +50,9 @@ function getUsername(): string | undefined {
   return username;
 }
 
-export const PLATFORM = getPlatform();
-export const DISTRO = getDistribution();
-export const PLATFORM_VERSION = getUAInfo().os.version;
+export const PLATFORM = userAgentInfo.platform.name;
+export const DISTRO = userAgentInfo.platform.distribution;
+export const PLATFORM_VERSION = userAgentInfo.platform.version;
 export const TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 export const LOCALE = navigator.language.replace('_', '-');
 export const COUNTRY = getCountry(TIMEZONE);
