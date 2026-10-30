@@ -18,16 +18,18 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
+        # The lowest supported runtime plus the version used for releases
+        node: [20, 22]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v4
 
       # Set up Node
-    - name: Use Node 20
+    - name: Use Node ${{ matrix.node }}
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: ${{ matrix.node }}
         registry-url: 'https://registry.npmjs.org'
 
       # Run install dependencies

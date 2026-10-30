@@ -7,28 +7,26 @@ on:
       - '*'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# Default to least privilege; jobs opt in to the extra permissions they need
+permissions:
+  contents: read
+
 jobs:
-  # This workflow contains a single job called "build"
+  # Build and validate the package, then hand the build output to the publish job
   build:
     # The type of runner that the job will run on
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-    permissions:
-      contents: write  # Required for creating releases
+    runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Fetch full history for changelog generation
 
-      # Set up Node
-    - name: Use Node 20
+      # Set up Node. Node 22 is only the release toolchain: the published
+      # package itself supports Node.js >= 20 (see package.json engines)
+    - name: Use Node 22
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 22
         registry-url: 'https://registry.npmjs.org'
 
       # Run install dependencies
@@ -43,6 +41,56 @@ jobs:
 
     - name: Test
       run: npm test
+
+      # Share the built package with the publish job
+    - name: Upload build output
+      uses: actions/upload-artifact@v4
+      with:
+        name: lib
+        path: lib
+
+  # Publish to npm using trusted publishing (OIDC).
+  # Only this job gets id-token: write; no other job can mint the npm identity.
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # Required for npm trusted publishing (OIDC)
+    steps:
+    - uses: actions/checkout@v4
+
+      # npm 12 requires Node.js >= 22.22.2, hence the pinned patch version
+    - name: Use Node 22.22.2
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.22.2
+        registry-url: 'https://registry.npmjs.org'
+
+      # Trusted publishing requires npm >= 11.5.1; pin an exact, vetted version
+    - name: Use npm 12.2.1
+      run: npm install npm@12.2.1 -g
+
+    - name: Download build output
+      uses: actions/download-artifact@v4
+      with:
+        name: lib
+        path: lib
+
+      # Scripts are disabled: the package was already built and tested by the build job
+    - name: Publish to npm
+      run: npm publish --access public --ignore-scripts
+
+  # Create the GitHub release once the package is published
+  release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required for creating releases
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for changelog generation
 
     - name: Get previous tag
       id: get_previous_tag
@@ -78,9 +126,3 @@ jobs:
         prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Publish to npm
-    - name: Publish to npm
-      run: npm publish --access public
-      env:
-        NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
