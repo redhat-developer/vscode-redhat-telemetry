@@ -61,7 +61,6 @@
     "countries-and-timezones": "^3.4.1",
     "getos": "^3.2.1",
     "object-hash": "^3.0.0",
-    "os-locale": "^5.0.0",
     "picomatch": "^4.0.2",
     "uuid": "^14.0.1"
   }
