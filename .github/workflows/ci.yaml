@@ -31,10 +31,18 @@ jobs:
       with:
         node-version: ${{ matrix.node }}
         registry-url: 'https://registry.npmjs.org'
+        cache: 'npm'
 
       # Run install dependencies
     - name: Install dependencies
-      run: npm i
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+      run: npm ci
+
+      # Fork PRs can change package.json, so their lifecycle scripts (prepare -> husky)
+      # are untrusted: install without running them.
+    - name: Install dependencies (fork PR, scripts disabled)
+      if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+      run: npm ci --ignore-scripts
 
       # Lint
     - name: Lint
